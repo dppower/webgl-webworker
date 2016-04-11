@@ -1,0 +1,34 @@
+<!doctype html>
+<html>
+<head>
+    <base href="/">
+    <title>Quaternions Visualised</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- 1. Load libraries -->
+    <!-- IE required polyfills, in this exact order -->
+    <script src="scripts/es6-shim/es6-shim.min.js"></script>
+    <script src="scripts/systemjs/dist/system-polyfills.js"></script>
+
+    <script src="scripts/angular2/bundles/angular2-polyfills.js"></script>
+    <script src="scripts/systemjs/dist/system.src.js"></script>
+    <script src="scripts/rxjs/bundles/Rx.js"></script>
+    <script src="scripts/angular2/bundles/angular2.dev.js"></script>
+
+    <script src="scripts/gl-matrix/dist/gl-matrix-min.js"></script>
+
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/normalize.css">
+    <!-- 2. Configure SystemJS -->
+    <script src="js/system-config.js"></script>
+    <script>
+      System.import("app/main").then(null, console.error.bind(console));
+    </script>
+</head>
+
+<!-- 3. Display the application -->
+<body>
+    <my-app>Loading...</my-app>
+</body>
+
+</html>
