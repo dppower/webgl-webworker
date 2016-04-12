@@ -16,11 +16,8 @@ export class Camera {
     };
 
     update(zoom: number) {
-        zoom = (zoom > -1.0) ? -1.0 : ((zoom < -5.0) ? -5.0 : zoom);
-        //console.log(zoom);
         this.transform_.position = new Vec3(0.0, 0.0, zoom);
         this.vMatrix_ = this.transform_.translate().array;
-        //console.log(this.vMatrix_); 
     };
 
     private aspect_;

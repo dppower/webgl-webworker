@@ -46,7 +46,8 @@ export class ResizableCanvasComponent implements OnDestroy {
 
     mouse_dx: number = 0;
     mouse_dy: number = 0;
-    zoom: number = -2.0;
+    zoomlevel: number = -2.0;
+    zoomSpeed: number = 0.2;
 
     cancelToken: number;
     
@@ -57,6 +58,18 @@ export class ResizableCanvasComponent implements OnDestroy {
         private zaxis_: ZAxis
     ) { };
     
+    zoom(direction: string) {
+        let zoom;
+        if (direction == "in") {
+            zoom = this.zoomlevel + this.zoomSpeed;
+            zoom = (zoom > -1.0) ? -1.0 : zoom;        
+        } else {
+            zoom = this.zoomlevel - this.zoomSpeed;
+            zoom = (zoom < -5.0) ? -5.0 : zoom;
+        };
+        this.zoomlevel = zoom;
+    };
+
     getCanvasWidth() {
         let width = this.canvasWidth > 1920 ? 1920 : this.canvasWidth;
         return width;
@@ -92,7 +105,7 @@ export class ResizableCanvasComponent implements OnDestroy {
         while (this.dt_ >= this.timeStep_) {
             this.dt_ -= this.timeStep_;
         }
-        this.camera_.update(this.zoom);
+        this.camera_.update(this.zoomlevel);
         this.update(this.mouse_dx, this.mouse_dy);
         this.draw(this.dt_, this.canvasWidth, this.canvasHeight);
         this.previousTime_ = timeNow;

@@ -56,9 +56,9 @@ export class CanvasFrameComponent {
     onMouseWheel(event: WheelEvent) {
         let delta = event.deltaY;
         if (delta > 0.0) {
-            this.canvas.zoom -= 0.2;
+            this.canvas.zoom("out");
         } else {
-            this.canvas.zoom += 0.2;
+            this.canvas.zoom("in");
         }
         return false;
     };
