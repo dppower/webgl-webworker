@@ -20,11 +20,11 @@ export class FragmentShader {
 
     private source_: string = `
     precision mediump float;
-
-    varying vec4 vColor;
+ 
+    uniform vec4 uAxisColour;
 
     void main(void) {
-        gl_FragColor = vColor;
+        gl_FragColor = uAxisColour;
     }
     `;
 

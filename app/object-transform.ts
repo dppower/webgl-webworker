@@ -15,11 +15,11 @@ export class Vec3 {
     get z() {
         return this.vector_[2];
     };
-
-    set copy(vec: Vec3) {
-        for (let i in vec) {
-            this.vector_[i] = vec[i]
-        }
+    
+    add(vec: Vec3) {
+        this.vector_[0] += vec.x;
+        this.vector_[1] += vec.y;
+        this.vector_[2] += vec.z;
     };
       
     private vector_: Float32Array;
@@ -32,9 +32,13 @@ export class Mat4 {
         this.identity();
     };
 
+    get array() {
+        return this.matrix_;
+    };
+
     identity() {
         for (let i = 0; i < 4; i++) {
-            for (let j = 0; i < 4; i++) {
+            for (let j = 0; j < 4; j++) {
                 this.matrix_[4 * i + j] = (j == i) ? 1 : 0;
             }
         }
@@ -82,9 +86,10 @@ export class Transform {
         return mat;
     };
 
-    translate(vec: Vec3) {
+    translate() {
+        //this.position_.add(vec);
         let mat = new Mat4();
-        mat.translate(vec);
+        mat.translate(this.position_);
         return mat;
     };
 
@@ -97,8 +102,15 @@ export class Transform {
         position = new Vec3(0, 0, 0),
         scale = new Vec3(1, 1, 1),
         rotation = new Quaternion(new Vec3(0, 0, 0), 0)
-    ) { };
+    ) {
+        this.position_ = position;
+        this.scale_ = scale;
+        this.rotation_ = rotation;
+    };
     
+    set position(vec: Vec3) { this.position_ = vec; };
+    get position() { return this.position_; };
+
     private position_: Vec3;
 
     private scale_: Vec3;

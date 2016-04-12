@@ -4,12 +4,25 @@ import {WebGLProgramService} from "./webgl-program";
 import {FragmentShader} from "./fragment-shader";
 import {VertexShader} from "./vertex-shader";
 import {Camera} from "./game-camera";
-import {GameObject} from "./game-object";
+import {XAxis} from "./x-axis";
+import {YAxis} from "./y-axis";
+import {ZAxis} from "./z-axis";
 
 @Component({
     selector: 'resizable-canvas',
     template: `
-    <canvas #canvas id="canvas" [width]="getCanvasWidth()" [height]="getCanvasHeight()" [style.width]="canvasWidth" [style.height]="canvasHeight" [style.top]="canvasTop" [style.left]="canvasLeft"><p>{{fallbackText}}</p></canvas>
+    <canvas id="canvas" 
+        #canvas 
+        [width]="getCanvasWidth()" 
+        [height]="getCanvasHeight()" 
+        [style.width]="canvasWidth" 
+        [style.height]="canvasHeight" 
+        [style.top]="canvasTop" 
+        [style.left]="canvasLeft">
+        <p>
+            {{fallbackText}}
+        </p>
+    </canvas>
     `,
     styles: [`
     #canvas {
@@ -17,7 +30,7 @@ import {GameObject} from "./game-object";
         z-index: 0;
     }
     `],
-    providers: [WebGLContextService, WebGLProgramService, FragmentShader, VertexShader, Camera, GameObject]
+    providers: [WebGLContextService, WebGLProgramService, FragmentShader, VertexShader, Camera, XAxis, YAxis, ZAxis]
 })
 export class ResizableCanvasComponent implements OnDestroy {
     @ViewChild("canvas") canvasRef: ElementRef;
@@ -31,9 +44,18 @@ export class ResizableCanvasComponent implements OnDestroy {
     canvasTop: string;
     canvasLeft: string;
 
-    cancelToken: number;
+    mouse_dx: number = 0;
+    mouse_dy: number = 0;
+    zoom: number = -2.0;
 
-    constructor(private context_: WebGLContextService, private program_: WebGLProgramService, private cube_: GameObject) { };
+    cancelToken: number;
+    
+        
+    constructor(private context_: WebGLContextService, private program_: WebGLProgramService, private camera_: Camera,
+        private xaxis_: XAxis,
+        private yaxis_: YAxis,
+        private zaxis_: ZAxis
+    ) { };
     
     getCanvasWidth() {
         let width = this.canvasWidth > 1920 ? 1920 : this.canvasWidth;
@@ -45,39 +67,72 @@ export class ResizableCanvasComponent implements OnDestroy {
         return height;
     };
 
-
     ngAfterViewInit() {
         let gl = this.context_.create(this.canvasRef.nativeElement);
         
         if (gl) {
             this.program_.initWebGl();
+            this.xaxis_.init(gl);
+            this.yaxis_.init(gl);
+            this.zaxis_.init(gl);
             this.cancelToken = requestAnimationFrame(() => {
-                this.mainloop();
+                this.tick();
             });
         }
         else {
-            console.log("Unable to initialise WebGL.");
             setTimeout(() => {
                 this.fallbackText = "Unable to initialise WebGL."
             }, 0);
         }
     }
 
-    mainloop() {
+    tick() {
         let timeNow = window.performance.now();
         this.dt_ += (timeNow - this.previousTime_); 
         while (this.dt_ >= this.timeStep_) {
-            this.cube_.update(this.timeStep_);
             this.dt_ -= this.timeStep_;
         }
-        this.program_.draw(this.dt_, this.canvasWidth, this.canvasHeight);
+        this.camera_.update(this.zoom);
+        this.update(this.mouse_dx, this.mouse_dy);
+        this.draw(this.dt_, this.canvasWidth, this.canvasHeight);
         this.previousTime_ = timeNow;
         requestAnimationFrame(() => {
-            this.mainloop();
+            this.tick();
         });
     };
 
+    update(mouse_dx: number, mouse_dy: number) {
+        mat4.identity(this.modelMatrix);
+        mat4.rotateX(this.modelMatrix, this.modelMatrix, mouse_dx * Math.PI / 180);
+        mat4.rotateY(this.modelMatrix, this.modelMatrix, mouse_dy * Math.PI / 180);
+    };
+
+    draw(dt: number, width: number, height: number) {
+        let gl = this.context_.get;
+
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        // Use the viewport to display all of the buffer
+        gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+        
+        // Aspect depends on the display size of the canvas, not drawing buffer.
+        let aspect = width / height;
+        this.camera_.aspect = aspect;
+
+        gl.uniformMatrix4fv(this.program_.uView, false, this.camera_.view);
+
+        gl.uniformMatrix4fv(this.program_.uProjection, false, this.camera_.projection);
+
+        gl.uniformMatrix4fv(this.program_.uModel, false, this.modelMatrix);
+
+        this.xaxis_.draw(gl, this.program_.uAxisColour, this.program_.aVertexPosition);
+        this.yaxis_.draw(gl, this.program_.uAxisColour, this.program_.aVertexPosition);
+        this.zaxis_.draw(gl, this.program_.uAxisColour, this.program_.aVertexPosition);
+    };
+
+    private modelMatrix: Float32Array = new Float32Array(16);
+
     ngOnDestroy() {
+        //this.context_.get.deleteProgram(this.program_.get);
         cancelAnimationFrame(this.cancelToken);
     }
 

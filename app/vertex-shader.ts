@@ -20,17 +20,13 @@ export class VertexShader {
 
     private source_: string = `
     attribute vec3 aVertexPosition;
-    attribute vec4 aVertexColor;
-
+    
     uniform mat4 uView;
     uniform mat4 uProjection;
     uniform mat4 uModel;
-    
-    varying vec4 vColor;
 
     void main(void) {
         gl_Position = uProjection * uView * uModel * vec4(aVertexPosition, 1.0);
-        vColor = aVertexColor;
     }
     `;
 

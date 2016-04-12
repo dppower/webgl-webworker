@@ -5,7 +5,16 @@ import {ResizableCanvasComponent} from "./resizable-canvas.component";
 @Component({
     selector: "canvas-frame",
     template: `
-    <div #frame id="frame" canvasFrame [inHeight]="frame.offsetHeight" [inWidth]="frame.offsetWidth" [inTop]="frame.offsetTop" [inLeft]="frame.offsetLeft"></div>
+    <div id="frame" 
+        #frame 
+        canvasFrame 
+        [inHeight]="frame.offsetHeight" 
+        [inWidth]="frame.offsetWidth" 
+        [inTop]="frame.offsetTop" 
+        [inLeft]="frame.offsetLeft" 
+        (mousemove)="onDrag($event)" 
+        (wheel)="onMouseWheel($event)"
+    ></div>
     <ng-content></ng-content>
     `,
     styles: [`
@@ -42,5 +51,25 @@ export class CanvasFrameComponent {
             this.outCanvasTop = this.frame.inTop;
             this.outCanvasLeft = this.frame.inLeft;
         }, 0);
+    };
+
+    onMouseWheel(event: WheelEvent) {
+        let delta = event.deltaY;
+        if (delta > 0.0) {
+            this.canvas.zoom -= 0.2;
+        } else {
+            this.canvas.zoom += 0.2;
+        }
+        return false;
+    };
+
+    onDrag(event: MouseEvent) {
+        if (event.buttons == 1) {
+            this.canvas.mouse_dx = event.movementX;
+            this.canvas.mouse_dy = event.movementY;
+        } else {
+            this.canvas.mouse_dx = 0;
+            this.canvas.mouse_dy = 0;
+        }
     };
 }

@@ -1,30 +1,22 @@
-import {Injectable, OnDestroy} from "angular2/core";
+import {Injectable} from "angular2/core";
 import {WebGLContextService} from "./webgl-context";
 import {FragmentShader} from "./fragment-shader";
 import {VertexShader} from "./vertex-shader";
 import {Camera} from "./game-camera";
-import {GameObject} from "./game-object";
 
 @Injectable()
-export class WebGLProgramService implements OnDestroy {
+export class WebGLProgramService {
     
     constructor(
         private context_: WebGLContextService,
         private fragShader_: FragmentShader,
-        private vertShader_: VertexShader,
-        private camera_: Camera,
-        private cube_: GameObject
+        private vertShader_: VertexShader
     ) { };
-
-    ngOnDestroy() {
-        this.context_.get.deleteProgram(this.program_);
-    };
 
     initWebGl() {
         let gl = this.context_.get;
         
         this.initProgram(gl);
-        this.cube_.initBuffers(this.context_.get);
         this.initVertexArrays(gl);
         gl.clearColor(0.5, 0.5, 0.5, 1.0);
         gl.clearDepth(1.0);
@@ -58,53 +50,29 @@ export class WebGLProgramService implements OnDestroy {
 
         gl.useProgram(this.program_);
 
-        this.vUniform_ = gl.getUniformLocation(this.program_, "uView");
-        this.pUniform_ = gl.getUniformLocation(this.program_, "uProjection");
-        this.mUniform_ = gl.getUniformLocation(this.program_, "uModel");
+        this.uAxisColour_ = gl.getUniformLocation(this.program_, "uAxisColour");
+        this.uView_ = gl.getUniformLocation(this.program_, "uView");
+        this.uProjection_ = gl.getUniformLocation(this.program_, "uProjection");
+        this.uModel_ = gl.getUniformLocation(this.program_, "uModel");
                 
     };
 
     initVertexArrays(gl: WebGLRenderingContext) {
-
-        let vertexPosition = gl.getAttribLocation(this.program_, "aVertexPosition");
-        let vertexColor= gl.getAttribLocation(this.program_, "aVertexColor");
-
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.cube_.cubeVerticesBuffer_);
-        gl.vertexAttribPointer(vertexPosition, 3, gl.FLOAT, false, 0, 0);
-        
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.cube_.cubeColorsBuffer_);
-        gl.vertexAttribPointer(vertexColor, 4, gl.FLOAT, false, 0, 0);
-
-        gl.enableVertexAttribArray(vertexPosition);
-        gl.enableVertexAttribArray(vertexColor);
+        this.aVertexPosition_ = gl.getAttribLocation(this.program_, "aVertexPosition");
+        gl.enableVertexAttribArray(this.aVertexPosition_);
     };
 
-    draw(dt: number, width: number, height: number) {
-        let gl = this.context_.get;
+    get aVertexPosition() { return this.aVertexPosition_; };
+    get uAxisColour() { return this.uAxisColour_; };
+    get uView() { return this.uView_; };
+    get uProjection() { return this.uProjection_; };
+    get uModel() { return this.uModel_; };
 
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-        // Use the viewport to display all of the buffer
-        gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
-        
-        // Aspect depends on the display size of the canvas, not drawing buffer.
-        let aspect = width / height;
-        this.camera_.aspect = aspect;
-
-        gl.uniformMatrix4fv(this.vUniform_, false, this.camera_.vMatrix);
-
-        gl.uniformMatrix4fv(this.pUniform_, false, this.camera_.pMatrix);
-
-        gl.uniformMatrix4fv(this.mUniform_, false, this.cube_.getmMatrix());
-
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.cube_.cubeIndexBuffer_);
-
-        gl.drawElements(gl.LINES, 36, gl.UNSIGNED_SHORT, 0);
-
-    };
-
-    private vUniform_: WebGLUniformLocation;
-    private pUniform_: WebGLUniformLocation;
-    private mUniform_: WebGLUniformLocation;
+    private aVertexPosition_: number;
+    private uAxisColour_: WebGLUniformLocation;
+    private uView_: WebGLUniformLocation;
+    private uProjection_: WebGLUniformLocation;
+    private uModel_: WebGLUniformLocation;
 
     private program_: WebGLProgram;
 }
