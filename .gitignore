@@ -1,5 +1,6 @@
 assets/
 build/
+public/mesh
 node_modules/
 typings/
 typings.json

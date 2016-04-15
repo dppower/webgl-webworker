@@ -53,8 +53,7 @@ export class WebGLProgramService {
         this.uAxisColour_ = gl.getUniformLocation(this.program_, "uAxisColour");
         this.uView_ = gl.getUniformLocation(this.program_, "uView");
         this.uProjection_ = gl.getUniformLocation(this.program_, "uProjection");
-        this.uModel_ = gl.getUniformLocation(this.program_, "uModel");
-                
+        this.uTransform_ = gl.getUniformLocation(this.program_, "uTransform");             
     };
 
     initVertexArrays(gl: WebGLRenderingContext) {
@@ -66,13 +65,13 @@ export class WebGLProgramService {
     get uAxisColour() { return this.uAxisColour_; };
     get uView() { return this.uView_; };
     get uProjection() { return this.uProjection_; };
-    get uModel() { return this.uModel_; };
+    get uTransform() { return this.uTransform_; };;
 
     private aVertexPosition_: number;
     private uAxisColour_: WebGLUniformLocation;
     private uView_: WebGLUniformLocation;
     private uProjection_: WebGLUniformLocation;
-    private uModel_: WebGLUniformLocation;
+    private uTransform_: WebGLUniformLocation;
 
     private program_: WebGLProgram;
 }

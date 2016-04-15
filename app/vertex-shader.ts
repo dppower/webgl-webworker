@@ -23,10 +23,10 @@ export class VertexShader {
     
     uniform mat4 uView;
     uniform mat4 uProjection;
-    uniform mat4 uModel;
+    uniform mat4 uTransform;
 
     void main(void) {
-        gl_Position = uProjection * uView * uModel * vec4(aVertexPosition, 1.0);
+        gl_Position = uProjection * uView * uTransform * vec4(aVertexPosition, 1.0);
     }
     `;
 

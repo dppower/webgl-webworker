@@ -7,6 +7,5 @@ export class CanvasFrameDirective {
     @Input() inWidth: number;
     @Input() inHeight: number;
     @Input() inTop: string;
-    @Input() inLeft: string;
-    
+    @Input() inLeft: string;  
 }

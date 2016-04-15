@@ -1,9 +1,11 @@
-import {Component, ViewChild, ElementRef, AfterViewInit, OnDestroy} from "angular2/core";
+import {Component, ViewChild, ElementRef, AfterViewInit, OnDestroy, provide, Inject} from "angular2/core";
 import {WebGLContextService} from "./webgl-context";
 import {WebGLProgramService} from "./webgl-program";
 import {FragmentShader} from "./fragment-shader";
 import {VertexShader} from "./vertex-shader";
 import {Camera} from "./game-camera";
+import {Transform, Vec3} from "./transform";
+import {MeshLoader} from "./mesh-loader";
 import {XAxis} from "./x-axis";
 import {YAxis} from "./y-axis";
 import {ZAxis} from "./z-axis";
@@ -26,11 +28,12 @@ import {ZAxis} from "./z-axis";
     `,
     styles: [`
     #canvas {
+        border: none;
         position: absolute;
         z-index: 0;
     }
     `],
-    providers: [WebGLContextService, WebGLProgramService, FragmentShader, VertexShader, Camera, XAxis, YAxis, ZAxis]
+    providers: [WebGLContextService, WebGLProgramService, FragmentShader, VertexShader, Camera, MeshLoader, XAxis, YAxis, ZAxis, provide("axis-transform", { useValue: new Transform() })]
 })
 export class ResizableCanvasComponent implements OnDestroy {
     @ViewChild("canvas") canvasRef: ElementRef;
@@ -46,28 +49,18 @@ export class ResizableCanvasComponent implements OnDestroy {
 
     mouse_dx: number = 0;
     mouse_dy: number = 0;
-    zoomlevel: number = -2.0;
-    zoomSpeed: number = 0.2;
-
+    angle = 0;
     cancelToken: number;
     
-        
     constructor(private context_: WebGLContextService, private program_: WebGLProgramService, private camera_: Camera,
         private xaxis_: XAxis,
         private yaxis_: YAxis,
-        private zaxis_: ZAxis
+        private zaxis_: ZAxis,
+        @Inject("axis-transform") private axisTransform_: Transform
     ) { };
     
-    zoom(direction: string) {
-        let zoom;
-        if (direction == "in") {
-            zoom = this.zoomlevel + this.zoomSpeed;
-            zoom = (zoom > -1.0) ? -1.0 : zoom;        
-        } else {
-            zoom = this.zoomlevel - this.zoomSpeed;
-            zoom = (zoom < -5.0) ? -5.0 : zoom;
-        };
-        this.zoomlevel = zoom;
+    updateCameraZoom(direction: string) {
+        this.camera_.update(direction);
     };
 
     getCanvasWidth() {
@@ -88,6 +81,8 @@ export class ResizableCanvasComponent implements OnDestroy {
             this.xaxis_.init(gl);
             this.yaxis_.init(gl);
             this.zaxis_.init(gl);
+            this.axisTransform_.setOrientation(new Vec3(1.0, 0.0, 0.0), 90.0);
+            this.axisTransform_.setRotation(new Vec3(0.0, 1.0, 0.0), this.angle);
             this.cancelToken = requestAnimationFrame(() => {
                 this.tick();
             });
@@ -103,21 +98,20 @@ export class ResizableCanvasComponent implements OnDestroy {
         let timeNow = window.performance.now();
         this.dt_ += (timeNow - this.previousTime_); 
         while (this.dt_ >= this.timeStep_) {
+            this.update(this.timeStep_, this.mouse_dx, this.mouse_dy);
             this.dt_ -= this.timeStep_;
         }
-        this.camera_.update(this.zoomlevel);
-        this.update(this.mouse_dx, this.mouse_dy);
         this.draw(this.dt_, this.canvasWidth, this.canvasHeight);
         this.previousTime_ = timeNow;
         requestAnimationFrame(() => {
             this.tick();
         });
     };
-
-    update(mouse_dx: number, mouse_dy: number) {
-        mat4.identity(this.modelMatrix);
-        mat4.rotateX(this.modelMatrix, this.modelMatrix, mouse_dx * Math.PI / 180);
-        mat4.rotateY(this.modelMatrix, this.modelMatrix, mouse_dy * Math.PI / 180);
+    
+    update(dt: number, mouse_dx: number, mouse_dy: number) {
+        this.angle += 0.1 * dt;
+        this.angle = this.angle % 360;
+        this.axisTransform_.setRotation(new Vec3(0.0, 1.0, 0.0), this.angle);    
     };
 
     draw(dt: number, width: number, height: number) {
@@ -135,14 +129,10 @@ export class ResizableCanvasComponent implements OnDestroy {
 
         gl.uniformMatrix4fv(this.program_.uProjection, false, this.camera_.projection);
 
-        gl.uniformMatrix4fv(this.program_.uModel, false, this.modelMatrix);
-
-        this.xaxis_.draw(gl, this.program_.uAxisColour, this.program_.aVertexPosition);
-        this.yaxis_.draw(gl, this.program_.uAxisColour, this.program_.aVertexPosition);
-        this.zaxis_.draw(gl, this.program_.uAxisColour, this.program_.aVertexPosition);
+        this.xaxis_.draw(gl, this.program_);
+        this.yaxis_.draw(gl, this.program_);
+        this.zaxis_.draw(gl, this.program_);
     };
-
-    private modelMatrix: Float32Array = new Float32Array(16);
 
     ngOnDestroy() {
         //this.context_.get.deleteProgram(this.program_.get);

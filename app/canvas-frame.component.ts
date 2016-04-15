@@ -1,6 +1,6 @@
 import {Component, ViewChild, ContentChild, AfterViewChecked, AfterContentChecked} from "angular2/core";
 import {CanvasFrameDirective} from "./canvas-frame.directive";
-import {ResizableCanvasComponent} from "./resizable-canvas.component";
+import {ResizableCanvasComponent} from "./canvas.component";
 
 @Component({
     selector: "canvas-frame",
@@ -26,7 +26,7 @@ import {ResizableCanvasComponent} from "./resizable-canvas.component";
         border: 0.25em dashed white;
     }
     `],
-    directives: [CanvasFrameDirective, ResizableCanvasComponent]
+    directives: [CanvasFrameDirective]
 })
 export class CanvasFrameComponent {
     @ViewChild(CanvasFrameDirective) frame: CanvasFrameDirective;
@@ -55,10 +55,11 @@ export class CanvasFrameComponent {
 
     onMouseWheel(event: WheelEvent) {
         let delta = event.deltaY;
+
         if (delta > 0.0) {
-            this.canvas.zoom("out");
+            this.canvas.updateCameraZoom("out");
         } else {
-            this.canvas.zoom("in");
+            this.canvas.updateCameraZoom("in");
         }
         return false;
     };
