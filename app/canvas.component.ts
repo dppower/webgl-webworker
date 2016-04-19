@@ -4,7 +4,8 @@ import {WebGLProgramService} from "./webgl-program";
 import {FragmentShader} from "./fragment-shader";
 import {VertexShader} from "./vertex-shader";
 import {Camera} from "./game-camera";
-import {Transform, Vec3} from "./transform";
+import {Transform} from "./transform";
+import {Vec3} from "./vec3";
 import {MeshLoader} from "./mesh-loader";
 import {XAxis} from "./x-axis";
 import {YAxis} from "./y-axis";
@@ -49,7 +50,7 @@ export class ResizableCanvasComponent implements OnDestroy {
 
     mouse_dx: number = 0;
     mouse_dy: number = 0;
-    angle = 0;
+
     cancelToken: number;
     
     constructor(private context_: WebGLContextService, private program_: WebGLProgramService, private camera_: Camera,
@@ -81,8 +82,9 @@ export class ResizableCanvasComponent implements OnDestroy {
             this.xaxis_.init(gl);
             this.yaxis_.init(gl);
             this.zaxis_.init(gl);
-            this.axisTransform_.setOrientation(new Vec3(1.0, 0.0, 0.0), 90.0);
-            this.axisTransform_.setRotation(new Vec3(0.0, 1.0, 0.0), this.angle);
+            this.axisTransform_.addRotation(new Vec3(1.0, 0.0, 0.0), 45.0);
+            
+            this.axisTransform_.addRotation(new Vec3(0.0, 1.0, 0.0), 45.0);
             this.cancelToken = requestAnimationFrame(() => {
                 this.tick();
             });
@@ -109,9 +111,11 @@ export class ResizableCanvasComponent implements OnDestroy {
     };
     
     update(dt: number, mouse_dx: number, mouse_dy: number) {
-        this.angle += 0.1 * dt;
-        this.angle = this.angle % 360;
-        this.axisTransform_.setRotation(new Vec3(0.0, 1.0, 0.0), this.angle);    
+        let dx = 0.005 * dt * mouse_dx;
+        let dy = -0.005 * dt * mouse_dy;
+
+        this.axisTransform_.addRotation(new Vec3(1.0, 0.0, 0.0), dy);
+        this.axisTransform_.addRotation(new Vec3(0.0, 1.0, 0.0), dx);    
     };
 
     draw(dt: number, width: number, height: number) {
@@ -122,7 +126,7 @@ export class ResizableCanvasComponent implements OnDestroy {
         gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
         
         // Aspect depends on the display size of the canvas, not drawing buffer.
-        let aspect = width / height;
+        let aspect = this.canvasWidth / this.canvasHeight;
         this.camera_.aspect = aspect;
 
         gl.uniformMatrix4fv(this.program_.uView, false, this.camera_.view);

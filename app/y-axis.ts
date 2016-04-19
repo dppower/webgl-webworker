@@ -1,6 +1,6 @@
 import {Inject, Injectable} from "angular2/core";
 import {WebGLProgramService} from "./webgl-program";
-import {Transform, Vec3} from "./transform";
+import {Transform} from "./transform";
 import {GameObject} from "./game-object";
 import {MeshLoader} from "./mesh-loader";
 
