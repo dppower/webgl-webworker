@@ -82,9 +82,9 @@ export class ResizableCanvasComponent implements OnDestroy {
             this.xaxis_.init(gl);
             this.yaxis_.init(gl);
             this.zaxis_.init(gl);
-            this.axisTransform_.addRotation(new Vec3(1.0, 0.0, 0.0), 45.0);
+            //this.axisTransform_.rotate(new Vec3(1.0, 0.0, 0.0), 45.0);
             
-            this.axisTransform_.addRotation(new Vec3(0.0, 1.0, 0.0), 45.0);
+            //this.axisTransform_.rotate(new Vec3(0.0, 1.0, 0.0), 90.0);
             this.cancelToken = requestAnimationFrame(() => {
                 this.tick();
             });
@@ -103,22 +103,26 @@ export class ResizableCanvasComponent implements OnDestroy {
             this.update(this.timeStep_, this.mouse_dx, this.mouse_dy);
             this.dt_ -= this.timeStep_;
         }
-        this.draw(this.dt_, this.canvasWidth, this.canvasHeight);
+        this.draw(this.dt_);
         this.previousTime_ = timeNow;
         requestAnimationFrame(() => {
             this.tick();
         });
     };
-    
-    update(dt: number, mouse_dx: number, mouse_dy: number) {
-        let dx = 0.005 * dt * mouse_dx;
-        let dy = -0.005 * dt * mouse_dy;
 
-        this.axisTransform_.addRotation(new Vec3(1.0, 0.0, 0.0), dy);
-        this.axisTransform_.addRotation(new Vec3(0.0, 1.0, 0.0), dx);    
+    angle = 0.0;
+
+    update(dt: number, mouse_dx: number, mouse_dy: number) {
+        //let dx = 0.005 * dt * mouse_dx;
+        //let dy = -0.005 * dt * mouse_dy;
+
+        //this.axisTransform_.addRotation(new Vec3(1.0, 0.0, 0.0), dy);
+        //this.axisTransform_.addRotation(new Vec3(0.0, 1.0, 0.0), dx);
+        this.axisTransform_.rotate(new Vec3(0.0, 1.0, 0.0), this.angle);
+        this.angle += (0.01 * dt);
     };
 
-    draw(dt: number, width: number, height: number) {
+    draw(dt: number) {
         let gl = this.context_.get;
 
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);

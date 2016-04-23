@@ -3,7 +3,8 @@ import {Vec3} from "./vec3";
 export class Quaternion {
     constructor(axis = new Vec3(), angle = 0.0) {
         let phi = angle * Math.PI / 360.0;
-        this.v_ = axis.scale(Math.sin(phi));
+        this.v_ = new Vec3();
+        Vec3.scale(Math.sin(phi), axis, this.v_);
         this.w_ = Math.cos(phi);     
     };
 
@@ -27,17 +28,17 @@ export class Quaternion {
         this.w_ = value;
     };
 
-    set x(value: number) {
-        this.v_.x = value;
-    };
+    //set x(value: number) {
+    //    this.v_.x = value;
+    //};
 
-    set y(value: number) {
-        this.v_.y = value;
-    };
+    //set y(value: number) {
+    //    this.v_.y = value;
+    //};
 
-    set z(value: number) {
-        this.v_.z = value;
-    };
+    //set z(value: number) {
+    //    this.v_.z = value;
+    //};
 
     set v(v: Vec3) {
         this.v_.copy(v);
@@ -48,12 +49,12 @@ export class Quaternion {
     };
 
     get length() {
-        return Math.sqrt(Math.pow(this.x, 2) + Math.pow(this.y, 2) + Math.pow(this.y, 2) + Math.pow(this.w, 2));
+        return Math.sqrt(Math.pow(this.x, 2) + Math.pow(this.y, 2) + Math.pow(this.z, 2) + Math.pow(this.w, 2));
     };
 
     conjugate() {
         let c = new Quaternion();
-        c.v.copy(this.v_.scale(-1.0));
+        Vec3.scale(-1.0, this.v_, c.v);
         c.w = this.w_
         return c;
     };
@@ -67,18 +68,30 @@ export class Quaternion {
         return r;
     };
 
+    normalise() {
+        let factor = 1.0 / this.length;
+
+        Vec3.scale(factor, this.v, this.v);
+        this.w *= factor;
+    }
+
     multiply(q: Quaternion) {
+        this.normalise();
+        q.normalise();
         let r = new Quaternion();
-        r.w = this.w * q.w - this.v_.dot(q.v);
-        r.v = this.v.scale(q.w).add(q.v.scale(this.w)).add(this.v.cross(q.v));
+        r.w = this.w * q.w - Vec3.dot(this.v_, q.v);
+        let v = new Vec3();
+        Vec3.scale(q.w, this.v_, v);
+        Vec3.add(r.v, v, r.v);
+        Vec3.scale(this.w, q.v, v);
+        Vec3.add(r.v, v, r.v);
+        Vec3.cross(this.v_, q.v, v);
+        Vec3.add(r.v, v, r.v);
+        //r.v = this.v.scale(q.w).add(q.v.scale(this.w)).add(this.v.cross(q.v));
         //r.x = (this.x * q.w) + (this.w * q.x) + (this.y * q.z) - (this.z * q.y);
         //r.y = (this.y * q.w) + (this.w * q.y) + (this.z * q.x) - (this.x * q.z);
         //r.z = (this.z * q.w) + (this.w * q.z) + (this.x * q.y) - (this.y * q.x);
         
-        //let factor = 1.0 / r.length;
-        
-        //r.v.scale(factor);
-        //r.w *= factor;
         return r;
 
     };

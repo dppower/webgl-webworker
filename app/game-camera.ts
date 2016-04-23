@@ -5,9 +5,9 @@ import {Vec3} from "./vec3";
 @Injectable()
 export class Camera {
 
-    initialZoom: number = -2.0;
-    maxZoom: number = -5.0;
-    zoomSpeed: number = 0.4;
+    initialZoom: number = -3.0;
+    maxZoom: number = -4.0;
+    zoomSpeed: number = 0.2;
 
     constructor() {
         let transform = new Vec3(0.0, 0.0, this.initialZoom);
@@ -47,14 +47,13 @@ export class Camera {
         this.pMatrix_[5] = f;
         this.pMatrix_[10] = (this.near_ + this.far_) * depth;
         this.pMatrix_[11] = -1.0;
-        this.pMatrix_[14] = 2.0 * (this.near_ * this.far_) * depth;
-        
+        this.pMatrix_[14] = 2.0 * (this.near_ * this.far_) * depth;       
     };
 
     private aspect_;
 
-    private near_ = 1.0;
-    private far_ = 50.0;
+    private near_ = 0.1;
+    private far_ = 1000.0;
 
     private pMatrix_: Float32Array = new Float32Array(16);
 

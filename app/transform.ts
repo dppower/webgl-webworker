@@ -5,11 +5,12 @@ import {Mat4} from "./mat4";
 export class Transform {
 
     get transform() {
-        this.matrix_.identity();
-        this.matrix_.translate(this.position_);
-        this.matrix_.rotate(this.orientation_);
-        this.matrix_.scale(this.scale_); 
-        return this.matrix_.array;
+        this.transform_.identity();
+        this.transform_.rotate(this.orientation_, this.angle_);
+        this.transform_.translate(this.position_);
+        this.transform_.scale(this.scale_);
+        return this.transform_.array;
+
     };
 
     scale(v: Vec3) {
@@ -17,15 +18,14 @@ export class Transform {
     };
 
     translate(v: Vec3) {
-        let a = this.position_.add(v);
-        this.position_.copy(a);
-        
+        Vec3.add(this.position_, v, this.position_);
     };
     
-    addRotation(vec: Vec3, angle: number) {
-        let q = new Quaternion(vec, angle);
-        let r = this.orientation_.multiply(q);
-        this.orientation_ = r;
+    rotate(vec: Vec3, angle: number) {
+        //let q = new Quaternion(vec, angle);
+        //let r = this.orientation_.multiply(q);
+        //this.orientation_ = r;
+        this.angle_ = angle * Math.PI / 180;
     };
 
     constructor(
@@ -34,5 +34,6 @@ export class Transform {
         private orientation_ = new Quaternion()
     ) { };
 
-    private matrix_ = new Mat4();
+    private transform_ = new Mat4();
+    private angle_ = 0.0;
 };

@@ -8,6 +8,7 @@ export class MeshLoader {
     constructor(private http_: Http) { };
 
     loadMesh(fileName: string): Observable<any> {
+        localStorage.clear();
         let json = localStorage.getItem(fileName);
         if (json) {
             let object = JSON.parse(json);

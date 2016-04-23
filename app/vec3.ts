@@ -18,64 +18,48 @@ export class Vec3 {
     get array() { return this.vector_; };
 
     get length() {
-        return Math.sqrt(Math.pow(this.x, 2) + Math.pow(this.y, 2) + Math.pow(this.y, 2));
+        return Math.sqrt(Math.pow(this.x, 2) + Math.pow(this.y, 2) + Math.pow(this.z, 2));
     };
 
-    dot(v: Vec3) {
-        return this.x * v.x + this.y * v.y + this.z * v.z;
+    static dot(a: Vec3, b: Vec3) {
+        return a.x * b.x + a.y * b.y + a.z * b.z;
     };
 
-    cross(a: Vec3) {
-        let b = new Vec3();
-        b.x = (this.y * a.z) - (this.z * a.y);
-        b.y = (this.z * a.x) - (this.x * a.z);
-        b.z = (this.x * a.y) - (this.y * a.x);
-        return b;
+    static cross(a: Vec3, b: Vec3, out: Vec3) {
+        out.x = (a.y * b.z) - (a.z * b.y);
+        out.y = (a.z * b.x) - (a.x * b.z);
+        out.z = (a.x * b.y) - (a.y * b.x);
     };
 
     normalise() {
-        let factor;
         let length = this.length;
-        if (length <= 0.0) {
-            factor = 1.0 / length;
-        } else {
-            factor = 1.0;
-        }
-        let u = this.scale(factor);
-        this.copy(u);
+        if (length > 0) {
+            let factor = 1.0 / length;
+            Vec3.scale(factor, this, this);
+        }    
     };
 
-    add(v: Vec3) {
-        let s = new Vec3();
-        s.copy(this);
-        s.x += v.x;
-        s.y += v.y;
-        s.z += v.z;
-        return s;
+    static add(a: Vec3, b: Vec3, out: Vec3) {
+        out.x = a.x + b.x;
+        out.y = a.y + b.y;
+        out.z = a.z + b.z;
     };
 
-    subtract(v: Vec3) {
-        let s = new Vec3();
-        s.copy(this);
-        s.x -= v.x;
-        s.y -= v.y;
-        s.z -= v.z;
-        return s;
+    static subtract(a: Vec3, b: Vec3, out: Vec3) {
+        out.x = a.x - b.x;
+        out.y = a.y - b.y;
+        out.z = a.z - b.z;
     };
 
-    scale(scalar: number) {
-        let v = new Vec3();
-        v.copy(this);
-        v.x *= scalar;
-        v.y *= scalar;
-        v.z *= scalar;
-        return v;
+    static scale(s: number, a: Vec3, out: Vec3) {
+        out.x = a.x * s;
+        out.y = a.y * s;
+        out.z = a.z * s;
     };
 
-    copy(vec: Vec3) {
-        let array = vec.array;
+    copy(a: Vec3) {
         for (let i in this.vector_) {
-            this.vector_[i] = array[i];
+            this.vector_[i] = a.array[i];
         }
     };
 

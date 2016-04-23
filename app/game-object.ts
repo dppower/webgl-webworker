@@ -5,6 +5,7 @@ import {Transform} from "./transform";
 class Mesh {
     vertices: Float32Array;
     indices: Uint16Array;
+    length: number;
 }
 
 export class GameObject {
@@ -24,6 +25,7 @@ export class GameObject {
         this.meshLoader_.loadMesh(this.meshFile_).subscribe(data => {
             this.mesh_.vertices = new Float32Array(data.vertices);
             this.mesh_.indices = new Uint16Array(data.indices);
+            this.mesh_.length = this.mesh_.indices.length;
             this.initBuffers(gl);
         });       
     };
@@ -53,7 +55,7 @@ export class GameObject {
 
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer_);
 
-        gl.drawElements(gl.LINES, 40, gl.UNSIGNED_SHORT, 0);
+        gl.drawElements(gl.LINES, this.mesh_.length, gl.UNSIGNED_SHORT, 0);
 
     };
 };
