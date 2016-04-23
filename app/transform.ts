@@ -6,7 +6,7 @@ export class Transform {
 
     get transform() {
         this.transform_.identity();
-        this.transform_.rotate(this.orientation_, this.angle_);
+        this.transform_.rotate(this.orientation_);
         this.transform_.translate(this.position_);
         this.transform_.scale(this.scale_);
         return this.transform_.array;
@@ -22,10 +22,9 @@ export class Transform {
     };
     
     rotate(vec: Vec3, angle: number) {
-        //let q = new Quaternion(vec, angle);
-        //let r = this.orientation_.multiply(q);
-        //this.orientation_ = r;
-        this.angle_ = angle * Math.PI / 180;
+        let q = new Quaternion(vec, angle);
+        let r = this.orientation_.multiply(q);
+        this.orientation_ = r;
     };
 
     constructor(

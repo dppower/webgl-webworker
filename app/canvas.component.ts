@@ -82,9 +82,8 @@ export class ResizableCanvasComponent implements OnDestroy {
             this.xaxis_.init(gl);
             this.yaxis_.init(gl);
             this.zaxis_.init(gl);
-            //this.axisTransform_.rotate(new Vec3(1.0, 0.0, 0.0), 45.0);
-            
-            //this.axisTransform_.rotate(new Vec3(0.0, 1.0, 0.0), 90.0);
+            this.axisTransform_.rotate(new Vec3(1.0, 0.0, 0.0), 45.0);
+
             this.cancelToken = requestAnimationFrame(() => {
                 this.tick();
             });
@@ -110,16 +109,15 @@ export class ResizableCanvasComponent implements OnDestroy {
         });
     };
 
-    angle = 0.0;
-
     update(dt: number, mouse_dx: number, mouse_dy: number) {
         //let dx = 0.005 * dt * mouse_dx;
         //let dy = -0.005 * dt * mouse_dy;
 
         //this.axisTransform_.addRotation(new Vec3(1.0, 0.0, 0.0), dy);
         //this.axisTransform_.addRotation(new Vec3(0.0, 1.0, 0.0), dx);
-        this.axisTransform_.rotate(new Vec3(0.0, 1.0, 0.0), this.angle);
-        this.angle += (0.01 * dt);
+        let angle = 0.1 * dt;
+        this.axisTransform_.rotate(new Vec3(0.0, 1.0, 0.0), angle);
+        
     };
 
     draw(dt: number) {

@@ -47,38 +47,31 @@ export class Mat4 {
         }
     };
 
-    rotate(q: Quaternion, angle: number) {
+    rotate(q: Quaternion) {
         let r = new Mat4();
-        //q.normalise();
-        //const n = 2.0;
-        //let wx = n * q.w * q.x;
-        //let wy = n * q.w * q.y;
-        //let wz = n * q.w * q.z;
-        //let xx = n * q.x * q.x;
-        //let yy = n * q.y * q.y;
-        //let zz = n * q.z * q.z;
-        //let xy = n * q.x * q.y;
-        //let xz = n * q.x * q.z;
-        //let yz = n * q.y * q.z;
+        q.normalise();
+        const n = 2.0;
+        let wx = n * q.w * q.x;
+        let wy = n * q.w * q.y;
+        let wz = n * q.w * q.z;
+        let xx = n * q.x * q.x;
+        let yy = n * q.y * q.y;
+        let zz = n * q.z * q.z;
+        let xy = n * q.x * q.y;
+        let xz = n * q.x * q.z;
+        let yz = n * q.y * q.z;
 
-        //r.array[0] = 1.0 - (yy + zz);
-        //r.array[4] = xy - wz;
-        //r.array[8] = xz + wy;
+        r.array[0] = 1.0 - (yy + zz);
+        r.array[1] = xy + wz;
+        r.array[2] = xz - wy;
 
-        //r.array[1] = xy + wz;
-        //r.array[5] = 1.0 - (xx + zz);
-        //r.array[9] = yz - wx;
+        r.array[4] = xy - wz;
+        r.array[5] = 1.0 - (xx + zz);
+        r.array[6] = yz + wx;
 
-        //r.array[2] = xz - wy;
-        //r.array[6] = yz + wx;
-        //r.array[10] = 1.0 - (xx + yy);
-
-        let s = Math.sin(angle);
-        let c = Math.cos(angle);
-        r.array[0] = c;
-        r.array[2] = s;
-        r.array[8] = -1.0 * s;
-        r.array[10] = c;
+        r.array[8] = xz + wy;
+        r.array[9] = yz - wx;
+        r.array[10] = 1.0 - (xx + yy);
         
         Mat4.multiply(this, r, this);
     };

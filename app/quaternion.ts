@@ -24,32 +24,20 @@ export class Quaternion {
         return this.w_;
     };
 
-    set w(value: number) {
-        this.w_ = value;
-    };
-
-    //set x(value: number) {
-    //    this.v_.x = value;
-    //};
-
-    //set y(value: number) {
-    //    this.v_.y = value;
-    //};
-
-    //set z(value: number) {
-    //    this.v_.z = value;
-    //};
-
-    set v(v: Vec3) {
-        this.v_.copy(v);
-    };
-
     get v() {
         return this.v_;
     };
 
     get length() {
         return Math.sqrt(Math.pow(this.x, 2) + Math.pow(this.y, 2) + Math.pow(this.z, 2) + Math.pow(this.w, 2));
+    };
+
+    set w(value: number) {
+        this.w_ = value;
+    };
+
+    set v(v: Vec3) {
+        this.v_.copy(v);
     };
 
     conjugate() {
@@ -87,7 +75,8 @@ export class Quaternion {
         Vec3.add(r.v, v, r.v);
         Vec3.cross(this.v_, q.v, v);
         Vec3.add(r.v, v, r.v);
-        //r.v = this.v.scale(q.w).add(q.v.scale(this.w)).add(this.v.cross(q.v));
+
+        // Above is equivalent to this calculation:
         //r.x = (this.x * q.w) + (this.w * q.x) + (this.y * q.z) - (this.z * q.y);
         //r.y = (this.y * q.w) + (this.w * q.y) + (this.z * q.x) - (this.x * q.z);
         //r.z = (this.z * q.w) + (this.w * q.z) + (this.x * q.y) - (this.y * q.x);
