@@ -10,6 +10,7 @@ import {MeshLoader} from "./mesh-loader";
 import {XAxis} from "./x-axis";
 import {YAxis} from "./y-axis";
 import {ZAxis} from "./z-axis";
+import {MainLoop} from "./mainloop";
 
 @Component({
     selector: 'resizable-canvas',
@@ -34,7 +35,7 @@ import {ZAxis} from "./z-axis";
         z-index: 0;
     }
     `],
-    providers: [WebGLContextService, WebGLProgramService, FragmentShader, VertexShader, Camera, MeshLoader, XAxis, YAxis, ZAxis, provide("axis-transform", { useValue: new Transform() })]
+    providers: [WebGLContextService, WebGLProgramService, FragmentShader, VertexShader, Camera, MeshLoader, XAxis, YAxis, ZAxis, provide("axis-transform", { useValue: new Transform() }), MainLoop]
 })
 export class ResizableCanvasComponent implements OnDestroy {
     @ViewChild("canvas") canvasRef: ElementRef;
@@ -57,6 +58,7 @@ export class ResizableCanvasComponent implements OnDestroy {
         private xaxis_: XAxis,
         private yaxis_: YAxis,
         private zaxis_: ZAxis,
+        private mainloop_: MainLoop,
         @Inject("axis-transform") private axisTransform_: Transform
     ) { };
     
@@ -93,6 +95,8 @@ export class ResizableCanvasComponent implements OnDestroy {
                 this.fallbackText = "Unable to initialise WebGL."
             }, 0);
         }
+
+        this.mainloop_.init();
     }
 
     tick() {
@@ -115,7 +119,7 @@ export class ResizableCanvasComponent implements OnDestroy {
 
         //this.axisTransform_.addRotation(new Vec3(1.0, 0.0, 0.0), dy);
         //this.axisTransform_.addRotation(new Vec3(0.0, 1.0, 0.0), dx);
-        let angle = 0.1 * dt;
+        let angle = 0.05 * dt;
         this.axisTransform_.rotate(new Vec3(0.0, 1.0, 0.0), angle);
         
     };
