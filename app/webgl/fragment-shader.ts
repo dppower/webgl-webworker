@@ -3,10 +3,10 @@ import {WebGLContextService} from "./webgl-context";
 
 @Injectable()
 export class FragmentShader {
-    constructor(private context_: WebGLContextService) { };
+    constructor(private gl_: WebGLContextService) { };
 
     getShader() {
-        let gl = this.context_.get;
+        let gl = this.gl_.context;
         this.shader_ = gl.createShader(gl.FRAGMENT_SHADER);
         gl.shaderSource(this.shader_, this.source_);
         gl.compileShader(this.shader_);
@@ -20,11 +20,12 @@ export class FragmentShader {
 
     private source_: string = `
     precision mediump float;
- 
-    uniform vec4 uAxisColour;
+    
+    varying vec2 vTextureCoordinates;
+    uniform sampler2D uTexture;
 
     void main(void) {
-        gl_FragColor = uAxisColour;
+        gl_FragColor = texture2D(uTexture, vTextureCoordinates);
     }
     `;
 

@@ -1,8 +1,8 @@
-import {Injectable, OnDestroy, OnInit} from "angular2/core";
+import {Injectable} from "angular2/core";
 import {Subject} from "rxjs/Rx";
 
 @Injectable()
-export class MainLoop implements OnDestroy, OnInit {
+export class MainLoop {
     worker_: Worker;
     messages_: Subject<string>;
 
@@ -22,12 +22,8 @@ export class MainLoop implements OnDestroy, OnInit {
     init() {
         this.worker_.postMessage("initial message");
     };
-
-    ngOnInit() {
-        console.log("ngOnInit was called.");
-    };
-
-    ngOnDestroy() {
+    
+    dispose() {
         this.worker_.terminate();
         this.messages_.complete();
     };

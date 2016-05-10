@@ -5,12 +5,12 @@ import {Vec3} from "./vec3";
 @Injectable()
 export class Camera {
 
-    initialZoom: number = -3.0;
+    minZoom: number = -3.0;
     maxZoom: number = -4.0;
     zoomSpeed: number = 0.2;
 
     constructor() {
-        let transform = new Vec3(0.0, 0.0, this.initialZoom);
+        let transform = new Vec3(0.0, 0.0, -3.5);
         this.transform_.translate(transform);
         this.vMatrix_ = this.transform_.transform;
     };
@@ -26,14 +26,12 @@ export class Camera {
         return this.pMatrix_;
     };
     
-    update(direction: string) {
-        let zoom;
-        let z_position = this.vMatrix_[14];
-        if (direction == "in") {
-            zoom = (z_position + this.zoomSpeed >= this.initialZoom) ? 0.0 : this.zoomSpeed;
-        } else {
-            zoom = (z_position - this.zoomSpeed <= this.maxZoom) ? 0.0 : -this.zoomSpeed;
-        };
+    update(direction: number) {
+        let zoom = direction * this.zoomSpeed;
+        let currentPosition = this.vMatrix_[14];
+
+        zoom = (zoom + currentPosition <= this.minZoom) ? 0.0 : ((zoom + currentPosition >= this.maxZoom) ? 0.0 : zoom);
+
         let transform = new Vec3(0.0, 0.0, zoom);
         this.transform_.translate(transform);
         this.vMatrix_ = this.transform_.transform;

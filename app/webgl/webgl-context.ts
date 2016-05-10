@@ -3,7 +3,7 @@ import {Injectable} from "angular2/core";
 @Injectable()
 export class WebGLContextService {
 
-    get get() { return this.context_; };
+    get context() { return this.context_; };
     
     constructor() { }
 

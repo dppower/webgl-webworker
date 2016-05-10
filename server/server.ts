@@ -1,8 +1,8 @@
-var express = require("express");
-var http = require("http");
-var path = require("path");
-var morgan = require("morgan");
-var fs = require("fs");
+import express = require("express");
+import http = require("http");
+import path = require("path");
+import morgan = require("morgan");
+import fs = require("fs");
 
 var app = express();
 

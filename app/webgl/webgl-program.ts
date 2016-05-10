@@ -2,19 +2,18 @@ import {Injectable} from "angular2/core";
 import {WebGLContextService} from "./webgl-context";
 import {FragmentShader} from "./fragment-shader";
 import {VertexShader} from "./vertex-shader";
-import {Camera} from "./game-camera";
 
 @Injectable()
 export class WebGLProgramService {
     
     constructor(
-        private context_: WebGLContextService,
+        private gl_: WebGLContextService,
         private fragShader_: FragmentShader,
         private vertShader_: VertexShader
     ) { };
 
     initWebGl() {
-        let gl = this.context_.get;
+        let gl = this.gl_.context;
         
         this.initProgram(gl);
         this.initVertexArrays(gl);
@@ -49,29 +48,36 @@ export class WebGLProgramService {
         gl.deleteShader(fragShader);
 
         gl.useProgram(this.program_);
-
-        this.uAxisColour_ = gl.getUniformLocation(this.program_, "uAxisColour");
+        
         this.uView_ = gl.getUniformLocation(this.program_, "uView");
         this.uProjection_ = gl.getUniformLocation(this.program_, "uProjection");
-        this.uTransform_ = gl.getUniformLocation(this.program_, "uTransform");             
+        this.uTransform_ = gl.getUniformLocation(this.program_, "uTransform");
+        this.uSampler_ = gl.getUniformLocation(this.program_, "uSampler");             
     };
 
     initVertexArrays(gl: WebGLRenderingContext) {
         this.aVertexPosition_ = gl.getAttribLocation(this.program_, "aVertexPosition");
         gl.enableVertexAttribArray(this.aVertexPosition_);
+
+        this.aNormals_ = gl.getAttribLocation(this.program_, "aNormals");
+        gl.enableVertexAttribArray(this.aNormals_);
     };
 
     get aVertexPosition() { return this.aVertexPosition_; };
-    get uAxisColour() { return this.uAxisColour_; };
+    get aNormals() { return this.aNormals_; };
+
     get uView() { return this.uView_; };
     get uProjection() { return this.uProjection_; };
     get uTransform() { return this.uTransform_; };;
+    get uSampler() { return this.uSampler_; };;
 
     private aVertexPosition_: number;
-    private uAxisColour_: WebGLUniformLocation;
+    private aNormals_: number;
+
     private uView_: WebGLUniformLocation;
     private uProjection_: WebGLUniformLocation;
     private uTransform_: WebGLUniformLocation;
+    private uSampler_: WebGLUniformLocation;
 
     private program_: WebGLProgram;
 }
