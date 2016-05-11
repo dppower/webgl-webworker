@@ -1,6 +1,7 @@
 import {Component, ViewChild, ContentChild, AfterViewChecked, AfterContentChecked} from "angular2/core";
 import {CanvasFrameDirective} from "./canvas-frame.directive";
 import {ResizableCanvasComponent} from "./canvas.component";
+import {InputManager} from "./input-manager";
 
 @Component({
     selector: "canvas-frame",
@@ -12,8 +13,10 @@ import {ResizableCanvasComponent} from "./canvas.component";
         [inWidth]="frame.offsetWidth" 
         [inTop]="frame.offsetTop" 
         [inLeft]="frame.offsetLeft" 
-        (mousemove)="onDrag($event)" 
-        (wheel)="onMouseWheel($event)"
+        (mousemove)="onMouseMove($event)" 
+        (wheel)="onMouseWheel($event)" 
+        (keydown)="onKeyDown($event)" 
+        (keyup)="onKeyUp($event)"
     ></div>
     <ng-content></ng-content>
     `,
@@ -26,7 +29,8 @@ import {ResizableCanvasComponent} from "./canvas.component";
         border: 0.25em dashed white;
     }
     `],
-    directives: [CanvasFrameDirective]
+    directives: [CanvasFrameDirective],
+    providers: [InputManager]
 })
 export class CanvasFrameComponent {
     @ViewChild(CanvasFrameDirective) frame: CanvasFrameDirective;
@@ -36,6 +40,8 @@ export class CanvasFrameComponent {
     outCanvasHeight: number;
     outCanvasTop: string;
     outCanvasLeft: string;
+
+    constructor(private inputManager_: InputManager) { };
 
     ngAfterContentChecked() {
         this.canvas.canvasHeight = this.outCanvasHeight;
@@ -54,23 +60,20 @@ export class CanvasFrameComponent {
     };
 
     onMouseWheel(event: WheelEvent) {
-        let delta = event.deltaY;
+        this.inputManager_.zoom = event.deltaY;
 
-        if (delta > 0.0) {
-            this.canvas.updateCameraZoom("out");
-        } else {
-            this.canvas.updateCameraZoom("in");
-        }
         return false;
     };
 
-    onDrag(event: MouseEvent) {
-        if (event.buttons == 1) {
-            this.canvas.mouse_dx = event.movementX;
-            this.canvas.mouse_dy = event.movementY;
-        } else {
-            this.canvas.mouse_dx = 0;
-            this.canvas.mouse_dy = 0;
-        }
+    onKeyDown(event: KeyboardEvent) {
+        this.inputManager_.KeyDown = event.key;
+    };
+
+    onKeyUp(event: KeyboardEvent) {
+        this.inputManager_.KeyUp = event.key;
+    };
+
+    onMouseMove(event: MouseEvent) {
+        this.inputManager_.setMouseCoords(event.clientX, event.clientY);
     };
 }

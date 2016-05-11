@@ -8,12 +8,6 @@
         "experimentalDecorators": true,
         "removeComments": false,
         "noImplicitAny": false,
-        "outDir": "./build"
-    },
-    "exclude": [
-        "typings/main.d.ts",
-        "typings/main",
-        "node_modules",
-        "server.js"
-    ]
+        "outDir": "./build/app"
+    }
 }

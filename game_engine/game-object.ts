@@ -1,7 +1,15 @@
 import {Transform} from "./transform";
 
 export class GameObject {
-    constructor(
-        private transform_: Transform
-    ) { };
+    isActive = true;
+
+    constructor(private transform_: Transform) { };
+
+    update(dt: number) {
+        return this;
+    };
+
+    markInactive() {
+        this.isActive = false;
+    };
 };

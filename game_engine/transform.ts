@@ -34,5 +34,4 @@ export class Transform {
     ) { };
 
     private transform_ = new Mat4();
-    private angle_ = 0.0;
 };

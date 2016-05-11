@@ -4,7 +4,8 @@ import {WebGLProgramService} from "./webgl/webgl-program";
 import {FragmentShader} from "./webgl/fragment-shader";
 import {VertexShader} from "./webgl/vertex-shader";
 import {RenderObject} from "./render-object";
-import {Http} from "angular2/http";
+import {RenderMessenger} from "./render-messenger.service";
+import {InputManager} from "./input-manager";
 
 @Component({
     selector: 'resizable-canvas',
@@ -29,7 +30,7 @@ import {Http} from "angular2/http";
         z-index: 0;
     }
     `],
-    providers: [WebGLContextService, WebGLProgramService, FragmentShader, VertexShader]
+    providers: [WebGLContextService, WebGLProgramService, FragmentShader, VertexShader, RenderMessenger]
 })
 export class ResizableCanvasComponent implements OnDestroy {
     @ViewChild("canvas") canvasRef: ElementRef;
@@ -50,7 +51,7 @@ export class ResizableCanvasComponent implements OnDestroy {
 
     cancelToken: number;
     
-    constructor(private gl_: WebGLContextService, private program_: WebGLProgramService, private http_: Http) { };
+    constructor(private gl_: WebGLContextService, private program_: WebGLProgramService, private inputManager_: InputManager, private renderMessenger_: RenderMessenger) { };
     
     getCanvasWidth() {
         let width = this.canvasWidth > 1920 ? 1920 : this.canvasWidth;
@@ -76,6 +77,10 @@ export class ResizableCanvasComponent implements OnDestroy {
             this.cancelToken = requestAnimationFrame(() => {
                 this.tick();
             });
+
+            this.renderMessenger_.getChanges((buffer) => {
+                this.modelChanges = buffer;
+            });
         }
         else {
             setTimeout(() => {
@@ -84,47 +89,42 @@ export class ResizableCanvasComponent implements OnDestroy {
         }
     }
 
+    private modelChanges: ArrayBuffer;
+
     private tick() {
-        let timeNow = window.performance.now();
-        this.dt_ += (timeNow - this.previousTime_); 
-        while (this.dt_ >= this.timeStep_) {
-            this.update(this.timeStep_, this.mouse_dx, this.mouse_dy);
-            this.dt_ -= this.timeStep_;
-        }
-        this.draw(this.dt_);
-        this.previousTime_ = timeNow;
         requestAnimationFrame(() => {
             this.tick();
         });
-    };
+        let timeNow = window.performance.now();
+        let inputs = this.inputManager_.inputs;
+        
+        inputs.aspect = this.canvasWidth / this.canvasHeight;
 
-    private update(dt: number, mouse_dx: number, mouse_dy: number) {
-        //let dx = 0.005 * dt * mouse_dx;
-        //let dy = -0.005 * dt * mouse_dy;
+        this.renderMessenger_.sendInputs(inputs);
 
-        //updateCameraZoom(direction: string) {
-        //    this.camera_.update(direction);
-        //};
-        //// Aspect depends on the display size of the canvas, not drawing buffer.
-        //let aspect = this.canvasWidth / this.canvasHeight;
-        //this.camera_.aspect = aspect;
-        //this.axisTransform_.addRotation(new Vec3(1.0, 0.0, 0.0), dy);
-        ////this.axisTransform_.addRotation(new Vec3(0.0, 1.0, 0.0), dx);
-        //let angle = 0.05 * dt;
-        //this.axisTransform_.rotate(new Vec3(0.0, 1.0, 0.0), angle);
+        this.dt_ += (timeNow - this.previousTime_); 
+        while (this.dt_ >= this.timeStep_) {
+            this.dt_ -= this.timeStep_;
+        }
+
+        let view = new Float32Array(this.modelChanges, 0, 16 * 4);
+        let projection = new Float32Array(this.modelChanges, 16, 16 * 4);
+        this.render(view, projection);
+
+        this.previousTime_ = timeNow;
         
     };
 
-    private draw(dt: number) {
+    private render(view: Float32Array, projection: Float32Array) {
         let gl = this.gl_.context;
 
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         // Use the viewport to display all of the buffer
         gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
-        gl.uniformMatrix4fv(this.program_.uView, false, this.camera_.view);
+        gl.uniformMatrix4fv(this.program_.uView, false, view);
 
-        gl.uniformMatrix4fv(this.program_.uProjection, false, this.camera_.projection);
+        gl.uniformMatrix4fv(this.program_.uProjection, false, projection);
 
         for (let i in this.renderBatch_) {
             this.renderBatch_[i].Draw(gl, this.program_,);

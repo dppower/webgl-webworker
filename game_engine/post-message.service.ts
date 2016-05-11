@@ -4,7 +4,7 @@ import {Subject} from "rxjs/Rx";
 declare function postMessage(data: any, transferables?: [ArrayBuffer]): void;
 
 @Injectable()
-export class PostMessageService {
+export class WorkerMessenger {
     private inputs$ = new Subject<Float32Array>();
     private modelChanges$ = new Subject<Float32Array>();
 
