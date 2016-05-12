@@ -1,10 +1,10 @@
 import {Component, ViewChild, ElementRef, AfterViewInit, OnDestroy, provide, Inject} from "angular2/core";
-import {WebGLContextService} from "./webgl/webgl-context";
-import {WebGLProgramService} from "./webgl/webgl-program";
+import {RenderContext} from "./webgl/webgl-context";
+import {ShaderProgram} from "./webgl/webgl-program";
 import {FragmentShader} from "./webgl/fragment-shader";
 import {VertexShader} from "./webgl/vertex-shader";
-import {RenderObject} from "./render-object";
-import {RenderMessenger} from "./render-messenger.service";
+import {RenderBatch} from "./render-batch";
+import {RenderMessenger} from "./render-messenger";
 import {InputManager} from "./input-manager";
 
 @Component({
@@ -30,14 +30,12 @@ import {InputManager} from "./input-manager";
         z-index: 0;
     }
     `],
-    providers: [WebGLContextService, WebGLProgramService, FragmentShader, VertexShader, RenderMessenger]
+    providers: [RenderContext, ShaderProgram, FragmentShader, VertexShader, RenderMessenger, RenderBatch]
 })
 export class ResizableCanvasComponent implements OnDestroy {
     @ViewChild("canvas") canvasRef: ElementRef;
     
     fallbackText: string = "Loading Canvas...";
-
-    private renderBatch_: RenderObject[] = [];
 
     // TODO If the client could change resolution, the binding to canvas height and width (dimensions of drawing buffer),
     // would be different to the style.height and style.width of the canvas.
@@ -46,12 +44,18 @@ export class ResizableCanvasComponent implements OnDestroy {
     canvasTop: string;
     canvasLeft: string;
 
-    mouse_dx: number = 0;
-    mouse_dy: number = 0;
-
     cancelToken: number;
-    
-    constructor(private gl_: WebGLContextService, private program_: WebGLProgramService, private inputManager_: InputManager, private renderMessenger_: RenderMessenger) { };
+
+
+    private modelChanges_: ArrayBuffer;
+
+    constructor(
+        private gl_: RenderContext,
+        private program_: ShaderProgram,
+        private inputManager_: InputManager,
+        private renderMessenger_: RenderMessenger,
+        private renderBatch_: RenderBatch
+    ) { };
     
     getCanvasWidth() {
         let width = this.canvasWidth > 1920 ? 1920 : this.canvasWidth;
@@ -69,17 +73,15 @@ export class ResizableCanvasComponent implements OnDestroy {
         if (gl) {
             this.program_.initWebGl();
 
-            // TODO async
-            for (let i in this.renderBatch_) {
-                this.renderBatch_[i].Start();
-            };
+            let gameObjects = ["base-model"];
+            this.renderBatch_.Start(gameObjects);
 
             this.cancelToken = requestAnimationFrame(() => {
                 this.tick();
             });
 
             this.renderMessenger_.getChanges((buffer) => {
-                this.modelChanges = buffer;
+                this.modelChanges_ = buffer;
             });
         }
         else {
@@ -89,7 +91,6 @@ export class ResizableCanvasComponent implements OnDestroy {
         }
     }
 
-    private modelChanges: ArrayBuffer;
 
     private tick() {
         requestAnimationFrame(() => {
@@ -107,8 +108,8 @@ export class ResizableCanvasComponent implements OnDestroy {
             this.dt_ -= this.timeStep_;
         }
 
-        let view = new Float32Array(this.modelChanges, 0, 16 * 4);
-        let projection = new Float32Array(this.modelChanges, 16, 16 * 4);
+        let view = new Float32Array(this.modelChanges_, 0, 64);
+        let projection = new Float32Array(this.modelChanges_, 64, 64);
         this.render(view, projection);
 
         this.previousTime_ = timeNow;
@@ -126,9 +127,7 @@ export class ResizableCanvasComponent implements OnDestroy {
 
         gl.uniformMatrix4fv(this.program_.uProjection, false, projection);
 
-        for (let i in this.renderBatch_) {
-            this.renderBatch_[i].Draw(gl, this.program_,);
-        };
+        this.renderBatch_.DrawAll(this.modelChanges_);
     };
 
     ngOnDestroy() {

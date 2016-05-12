@@ -1,13 +1,13 @@
 import {Injectable} from "angular2/core";
-import {WebGLContextService} from "./webgl-context";
+import {RenderContext} from "./webgl-context";
 import {FragmentShader} from "./fragment-shader";
 import {VertexShader} from "./vertex-shader";
 
 @Injectable()
-export class WebGLProgramService {
+export class ShaderProgram {
     
     constructor(
-        private gl_: WebGLContextService,
+        private gl_: RenderContext,
         private fragShader_: FragmentShader,
         private vertShader_: VertexShader
     ) { };
