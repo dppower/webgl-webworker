@@ -6,7 +6,7 @@ export class GameObject {
     constructor(private transform_: Transform) { };
 
     update(dt: number) {
-        return this;
+        return this.transform_.transform;
     };
 
     markInactive() {

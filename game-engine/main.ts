@@ -1,4 +1,4 @@
-/// <reference path="../node_modules/typescript/lib/lib.webworker.d.ts"/>
+///<reference path="../node_modules/typescript/lib/lib.es6.d.ts" />
 
 import {platform, provide} from "angular2/core";
 import {WORKER_APP_PLATFORM, WORKER_APP_APPLICATION} from "angular2/platform/worker_app";

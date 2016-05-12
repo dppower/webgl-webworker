@@ -2,8 +2,11 @@
   "name": "angular2-quaternions",
   "version": "1.0.0",
   "scripts": {
-    "tsc": "tsc",
-    "start": "npm run tsc && node server.js"
+    "tsc-server": "tsc -p ./server/",
+    "tsc-app": "tsc -p ./app/",
+    "tsc-engine": "tsc -p ./game-engine/",
+    "tsc-all": "npm run tsc-server && npm run tsc-app && npm run tsc-engine",
+    "start": "node ./build/server.js"
   },
   "license": "ISC",
   "dependencies": {

@@ -14,8 +14,6 @@ export class Camera {
         this.transform_.translate(transform);
         this.vMatrix_ = this.transform_.transform;
     };
-
-    set aspect(aspect: number) { this.aspect_ = aspect; };
     
     get view() {
         return this.vMatrix_;
@@ -26,7 +24,7 @@ export class Camera {
         return this.pMatrix_;
     };
     
-    update(direction: number) {
+    update(direction: number, aspect: number) {
         let zoom = direction * this.zoomSpeed;
         let currentPosition = this.vMatrix_[14];
 
@@ -35,6 +33,8 @@ export class Camera {
         let transform = new Vec3(0.0, 0.0, zoom);
         this.transform_.translate(transform);
         this.vMatrix_ = this.transform_.transform;
+
+        this.aspect_ = aspect;
     };
 
     calculateFrustrum() {

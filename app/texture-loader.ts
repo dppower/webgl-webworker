@@ -1,7 +1,7 @@
 import {Injectable} from "angular2/core";
 import {Observable, Observer} from "rxjs/Rx";
 import {Http, Response} from "angular2/http";
-import {WebGLContextService} from "./webgl/webgl-context";
+import {RenderContext} from "./webgl/webgl-context";
 import {PngDecoder} from "./png-decoder";
 
 export class Texture {
@@ -26,7 +26,7 @@ export class Texture {
 export class TextureLoader {
     private cache_: { [textureId: string]: Texture } = {};
 
-    constructor(private http_: Http, private gl_: WebGLContextService, private decoder_: PngDecoder) { };
+    constructor(private http_: Http, private gl_: RenderContext, private decoder_: PngDecoder) { };
 
     loadTexture(fileName: string): Observable<Texture> {
         let texture: Texture = this.cache_[fileName];

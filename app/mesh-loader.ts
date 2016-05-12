@@ -1,7 +1,7 @@
 import {Injectable} from "angular2/core";
 import {Observable, Observer} from "rxjs/Rx";
 import {Http, Response} from "angular2/http";
-import {WebGLContextService} from "./webgl/webgl-context";
+import {RenderContext} from "./webgl/webgl-context";
 
 export class Mesh {
     vertexBuffer: WebGLBuffer;
@@ -30,7 +30,7 @@ export class Mesh {
 export class MeshLoader {
     private cache_: { [meshId: string]: Mesh } = {};
 
-    constructor(private http_: Http, private gl_: WebGLContextService) { };
+    constructor(private http_: Http, private gl_: RenderContext) { };
 
     loadMesh(fileName: string): Observable<Mesh> {
         let mesh: Mesh = this.cache_[fileName] || this.getMeshFromLocal(fileName);

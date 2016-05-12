@@ -1,18 +1,19 @@
 import {Injectable} from "angular2/core";
 import {Subject} from "rxjs/Rx";
+import {InputState} from "./input-state";
 
 declare function postMessage(data: any, transferables?: [ArrayBuffer]): void;
 
 @Injectable()
 export class WorkerMessenger {
-    private inputs$ = new Subject<Float32Array>();
-    private modelChanges$ = new Subject<Float32Array>();
+    private inputs$ = new Subject<InputState>();
+    private modelChanges$ = new Subject<ArrayBuffer>();
 
     constructor() { 
         addEventListener("message", this.handleMessages);
 
-        this.modelChanges$.subscribe((data: Float32Array) => {
-            postMessage(data.buffer, [data.buffer]);
+        this.modelChanges$.subscribe((data: ArrayBuffer) => {
+            postMessage(data, [data]);
         });
     };
 
@@ -26,11 +27,11 @@ export class WorkerMessenger {
         this.inputs$.complete();
     };
 
-    pushChanges(array: Float32Array) {
-        this.modelChanges$.next(array);
+    pushChanges(buffer: ArrayBuffer) {
+        this.modelChanges$.next(buffer);
     };
 
-    getInputs(onNext: (array: Float32Array) => void) {
+    getInputs(onNext: (inputs: InputState) => void) {
         return this.inputs$.subscribe(onNext);
     };
       

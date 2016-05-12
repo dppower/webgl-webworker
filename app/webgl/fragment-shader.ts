@@ -1,9 +1,9 @@
 import {Injectable} from "angular2/core";
-import {WebGLContextService} from "./webgl-context";
+import {RenderContext} from "./webgl-context";
 
 @Injectable()
 export class FragmentShader {
-    constructor(private gl_: WebGLContextService) { };
+    constructor(private gl_: RenderContext) { };
 
     getShader() {
         let gl = this.gl_.context;
