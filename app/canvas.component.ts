@@ -1,4 +1,4 @@
-import {Component, ViewChild, ElementRef, AfterViewInit, OnDestroy, provide, Inject} from "angular2/core";
+import {Component, ViewChild, ElementRef, AfterViewInit, OnDestroy, NgZone} from "angular2/core";
 import {RenderContext} from "./webgl/webgl-context";
 import {ShaderProgram, BASIC_SHADER} from "./webgl/webgl-program";
 import {FragmentShader} from "./webgl/fragment-shader";
@@ -56,7 +56,8 @@ export class MainCanvas implements OnDestroy {
         private program_: ShaderProgram,
         private inputManager_: InputManager,
         private renderMessenger_: RenderMessenger,
-        private renderBatch_: RenderBatch
+        private renderBatch_: RenderBatch,
+        private zone_: NgZone
     ) {
         this.renderMessenger_.getChanges((array) => {
             this.modelChanges_.set(array);
@@ -82,8 +83,11 @@ export class MainCanvas implements OnDestroy {
             let gameObjects = ["base-model"];
             this.renderBatch_.Start(gameObjects);
 
-            this.cancelToken = requestAnimationFrame(this.tick);
-
+            //this.cancelToken = requestAnimationFrame(this.tick);
+            this.zone_.runOutsideAngular(() => {
+                let timeNow = performance.now();
+                this.tick(timeNow);
+            });
         }
         else {
             setTimeout(() => {
@@ -91,10 +95,8 @@ export class MainCanvas implements OnDestroy {
             }, 0);
         }
     }
-
-    counter = 0;
-
-    private tick = (timestamp) => {
+    
+    private tick = (timestamp: number) => {
         this.cancelToken = requestAnimationFrame(this.tick);
         
         let inputs = this.inputManager_.inputs;
@@ -102,23 +104,16 @@ export class MainCanvas implements OnDestroy {
         inputs.aspect = this.canvasWidth / this.canvasHeight;
 
         this.renderMessenger_.sendInputs(inputs);
-        
+
+        this.inputManager_.Update();
+
         let view = this.modelChanges_.subarray(0, 16);
         let projection = this.modelChanges_.subarray(16, 32);
 
-        this.counter++;
-        if (this.counter == 120) {
-            console.log("---------------");
-            //console.log("view: " + view.toString());
-            //console.log("projection: " + projection.toString());
-            console.log("current time: " + timestamp);
-            this.counter = 0;
-        }
-
         this.render(view, projection);
-
-        this.inputManager_.Update();
         
+        console.log("---------------");
+        console.log("current time: " + timestamp);
     };
 
     private render(view: Float32Array, projection: Float32Array) {
