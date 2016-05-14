@@ -1,14 +1,17 @@
 import {Component, ViewChild, ElementRef, AfterViewInit, OnDestroy, provide, Inject} from "angular2/core";
 import {RenderContext} from "./webgl/webgl-context";
-import {ShaderProgram} from "./webgl/webgl-program";
+import {ShaderProgram, BASIC_SHADER} from "./webgl/webgl-program";
 import {FragmentShader} from "./webgl/fragment-shader";
 import {VertexShader} from "./webgl/vertex-shader";
-import {RenderBatch} from "./render-batch";
+import {RenderBatch, RENDER_PROVIDERS} from "./render-batch";
 import {RenderMessenger} from "./render-messenger";
 import {InputManager} from "./input-manager";
+import {MeshLoader} from "./mesh-loader";
+
+const RENDER_OBJECTS = 3;
 
 @Component({
-    selector: 'resizable-canvas',
+    selector: 'main-canvas',
     template: `
     <canvas id="canvas" 
         #canvas 
@@ -30,9 +33,9 @@ import {InputManager} from "./input-manager";
         z-index: 0;
     }
     `],
-    providers: [RenderContext, ShaderProgram, FragmentShader, VertexShader, RenderMessenger, RenderBatch]
+    providers: [RenderContext, BASIC_SHADER, RenderMessenger, RENDER_PROVIDERS]
 })
-export class ResizableCanvasComponent implements OnDestroy {
+export class MainCanvas implements OnDestroy {
     @ViewChild("canvas") canvasRef: ElementRef;
     
     fallbackText: string = "Loading Canvas...";
@@ -46,8 +49,7 @@ export class ResizableCanvasComponent implements OnDestroy {
 
     cancelToken: number;
 
-
-    private modelChanges_: ArrayBuffer;
+    private modelChanges_ = new Float32Array(RENDER_OBJECTS * 16);
 
     constructor(
         private gl_: RenderContext,
@@ -55,7 +57,11 @@ export class ResizableCanvasComponent implements OnDestroy {
         private inputManager_: InputManager,
         private renderMessenger_: RenderMessenger,
         private renderBatch_: RenderBatch
-    ) { };
+    ) {
+        this.renderMessenger_.getChanges((array) => {
+            this.modelChanges_.set(array);
+        });
+    };
     
     getCanvasWidth() {
         let width = this.canvasWidth > 1920 ? 1920 : this.canvasWidth;
@@ -76,13 +82,8 @@ export class ResizableCanvasComponent implements OnDestroy {
             let gameObjects = ["base-model"];
             this.renderBatch_.Start(gameObjects);
 
-            this.cancelToken = requestAnimationFrame(() => {
-                this.tick();
-            });
+            this.cancelToken = requestAnimationFrame(this.tick);
 
-            this.renderMessenger_.getChanges((buffer) => {
-                this.modelChanges_ = buffer;
-            });
         }
         else {
             setTimeout(() => {
@@ -91,28 +92,32 @@ export class ResizableCanvasComponent implements OnDestroy {
         }
     }
 
+    counter = 0;
 
-    private tick() {
-        requestAnimationFrame(() => {
-            this.tick();
-        });
-        let timeNow = window.performance.now();
-        let inputs = this.inputManager_.inputs;
+    private tick = (timestamp) => {
+        this.cancelToken = requestAnimationFrame(this.tick);
         
+        let inputs = this.inputManager_.inputs;
+
         inputs.aspect = this.canvasWidth / this.canvasHeight;
 
         this.renderMessenger_.sendInputs(inputs);
+        
+        let view = this.modelChanges_.subarray(0, 16);
+        let projection = this.modelChanges_.subarray(16, 32);
 
-        this.dt_ += (timeNow - this.previousTime_); 
-        while (this.dt_ >= this.timeStep_) {
-            this.dt_ -= this.timeStep_;
+        this.counter++;
+        if (this.counter == 120) {
+            console.log("---------------");
+            //console.log("view: " + view.toString());
+            //console.log("projection: " + projection.toString());
+            console.log("current time: " + timestamp);
+            this.counter = 0;
         }
 
-        let view = new Float32Array(this.modelChanges_, 0, 64);
-        let projection = new Float32Array(this.modelChanges_, 64, 64);
         this.render(view, projection);
 
-        this.previousTime_ = timeNow;
+        this.inputManager_.Update();
         
     };
 
@@ -136,8 +141,4 @@ export class ResizableCanvasComponent implements OnDestroy {
         // TODO remove when a better way of chceking if meshes are up to date.
         localStorage.clear();
     }
-
-    private previousTime_: number = 0;
-    private timeStep_: number = 1000 / 60.0;
-    private dt_: number = 0;
 }

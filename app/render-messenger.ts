@@ -1,25 +1,27 @@
-import {Injectable} from "angular2/core";
+import {Injectable, Inject} from "angular2/core";
 import {Subject} from "rxjs/Rx";
 import {InputState} from "./input-manager";
-
-declare function postMessage(data: any, transferables?: [ArrayBuffer]): void;
+import {GAME_ENGINE} from "./service-tokens";
 
 @Injectable()
 export class RenderMessenger {
 
     private inputs$ = new Subject<InputState>();
-    private modelChanges$ = new Subject<ArrayBuffer>();
+    private modelChanges$ = new Subject<Float32Array>();
 
-    constructor() {
-        addEventListener("message", this.handleMessages);
+    constructor(@Inject(GAME_ENGINE)private worker_: Worker) {
+        this.worker_.onmessage = this.handleMessages;
 
-        this.inputs$.subscribe((inputs: InputState) => {
-            postMessage(inputs);
+        this.inputs$.subscribe((inputs: InputState) => {            
+            this.worker_.postMessage(inputs);
         });
     };
 
+    counter = 0;
+
     private handleMessages: EventListener = (event: MessageEvent) => {
-        this.modelChanges$.next(event.data);
+        let array = new Float32Array(event.data);
+        this.modelChanges$.next(array);
     };
 
     dispose() {
@@ -28,7 +30,7 @@ export class RenderMessenger {
         this.inputs$.complete();
     };
 
-    getChanges(onNext: (array: ArrayBuffer) => void) {
+    getChanges(onNext: (array: Float32Array) => void) {
         return this.modelChanges$.subscribe(onNext);
     };
 

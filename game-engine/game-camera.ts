@@ -1,8 +1,6 @@
-import {Injectable} from "angular2/core";
 import {Transform} from "./transform";
 import {Vec3} from "./vec3";
 
-@Injectable()
 export class Camera {
 
     minZoom: number = -3.0;

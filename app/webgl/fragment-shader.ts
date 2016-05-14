@@ -1,12 +1,8 @@
-import {Injectable} from "angular2/core";
-import {RenderContext} from "./webgl-context";
 
-@Injectable()
 export class FragmentShader {
-    constructor(private gl_: RenderContext) { };
+    constructor() { };
 
-    getShader() {
-        let gl = this.gl_.context;
+    getShader(gl: WebGLRenderingContext) {
         this.shader_ = gl.createShader(gl.FRAGMENT_SHADER);
         gl.shaderSource(this.shader_, this.source_);
         gl.compileShader(this.shader_);
@@ -25,7 +21,8 @@ export class FragmentShader {
     uniform sampler2D uTexture;
 
     void main(void) {
-        gl_FragColor = texture2D(uTexture, vTextureCoordinates);
+        //gl_FragColor = texture2D(uTexture, vTextureCoordinates);
+        gl_FragColor = vec4(0.0, 0.0, 1.0, 1.0);
     }
     `;
 

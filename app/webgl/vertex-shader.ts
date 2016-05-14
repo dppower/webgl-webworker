@@ -1,12 +1,8 @@
-import {Injectable} from "angular2/core";
-import {RenderContext} from "./webgl-context";
 
-@Injectable()
 export class VertexShader {
-    constructor(private gl_: RenderContext) { };
+    constructor() { };
 
-    getShader() {
-        let gl = this.gl_.context;
+    getShader(gl: WebGLRenderingContext) {
         this.shader_ = gl.createShader(gl.VERTEX_SHADER);
         gl.shaderSource(this.shader_, this.source_);
         gl.compileShader(this.shader_);
@@ -28,10 +24,13 @@ export class VertexShader {
     uniform mat4 uTransform;
     
     varying vec2 vTextureCoordinates;
+    varying vec3 vNormals;
 
     void main(void) {
+        
         gl_Position = uProjection * uView * uTransform * vec4(aVertexPosition, 1.0);
         vTextureCoordinates = aTextureCoordinates;
+        vNormals = aNormals;
     }
     `;
 

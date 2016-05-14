@@ -1,9 +1,7 @@
-import {Injectable} from "angular2/core";
 import {GameObject} from "./game-object";
 import {Camera} from "./game-camera";
 import {InputState} from "./input-state";
 
-@Injectable()
 export class GameState {
 
     private gameObjects_: GameObject[] = [];
@@ -21,17 +19,17 @@ export class GameState {
         let bufferLength = (this.gameObjects_.length + 2) * 16 * 4;
         let buffer = new ArrayBuffer(bufferLength);
 
-        let view = new Float32Array(buffer, 0, 64);
-        let projection = new Float32Array(buffer, 64, 64);
+        let view = new Float32Array(buffer, 0, 16);
+        let projection = new Float32Array(buffer, 64, 16);
 
         this.camera_.update(inputs.zoom, inputs.aspect);
 
-        view = this.camera_.view;
-        projection = this.camera_.projection;
+        view.set(this.camera_.view);
+        projection.set(this.camera_.projection);
 
         this.gameObjects_.forEach((object, i, array) => {
-            let matrix = new Float32Array(buffer, (i + 2) * 64, 64);
-            matrix = object.update(dt);
+            let matrix = new Float32Array(buffer, (i + 2) * 64, 16);
+            matrix.set(object.update(dt));
         });
 
         return buffer;

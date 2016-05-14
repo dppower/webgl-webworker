@@ -9,13 +9,17 @@ export class RenderObject {
 
     //private texture_: Texture;
 
+    private transform_ = new Float32Array(16);
+
     constructor(
         private meshFile_: string
         //private textureFile_: string,
     ) { };
 
     Start(meshLoader: MeshLoader) {
+        console.log("start mesh file: " + this.meshFile_);
         meshLoader.loadMesh(this.meshFile_).subscribe(mesh => {
+            console.log("mesh file: " + this.meshFile_);
             this.mesh_ = mesh;
             this.meshLoaded_ = true;
         });
@@ -26,7 +30,7 @@ export class RenderObject {
         //});
     };
     
-    Draw(gl: WebGLRenderingContext, program: ShaderProgram, transform: Float32Array) {
+    Draw(gl: WebGLRenderingContext, program: ShaderProgram, array: Float32Array) {
 
         if (!this.meshLoaded_ /*|| !this.textureLoaded_*/) return;
 
@@ -39,8 +43,10 @@ export class RenderObject {
 
         gl.bindBuffer(gl.ARRAY_BUFFER, this.mesh_.normalBuffer);
         gl.vertexAttribPointer(program.aNormals, 3, gl.FLOAT, false, 0, 0);
+        
+        this.transform_.set(array);
 
-        gl.uniformMatrix4fv(program.uTransform, false, transform);
+        gl.uniformMatrix4fv(program.uTransform, false, this.transform_);
 
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.mesh_.indexBuffer);
 

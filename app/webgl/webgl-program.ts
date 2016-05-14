@@ -1,4 +1,4 @@
-import {Injectable} from "angular2/core";
+import {Injectable, provide} from "angular2/core";
 import {RenderContext} from "./webgl-context";
 import {FragmentShader} from "./fragment-shader";
 import {VertexShader} from "./vertex-shader";
@@ -24,8 +24,8 @@ export class ShaderProgram {
     };
 
     initProgram(gl: WebGLRenderingContext) {
-        let vertShader = this.vertShader_.getShader();
-        let fragShader = this.fragShader_.getShader();
+        let vertShader = this.vertShader_.getShader(gl);
+        let fragShader = this.fragShader_.getShader(gl);
 
         this.program_ = gl.createProgram();
         gl.attachShader(this.program_, vertShader);
@@ -81,3 +81,9 @@ export class ShaderProgram {
 
     private program_: WebGLProgram;
 }
+
+export const BASIC_SHADER = [
+    FragmentShader,
+    VertexShader,
+    ShaderProgram
+];

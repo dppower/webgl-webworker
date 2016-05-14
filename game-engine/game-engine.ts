@@ -1,4 +1,3 @@
-import {Component, OnDestroy} from "angular2/core";
 import {WorkerMessenger} from "./worker-messenger";
 import {Camera} from "./game-camera";
 import {GameObject} from "./game-object";
@@ -11,29 +10,16 @@ interface Performance {
 }
 declare var performance: Performance;
 
-@Component({
-    selector: "game-engine",
-    providers: [WorkerMessenger, Camera, GameState]
-})
-export class GameEngine implements OnDestroy {
+export class GameEngine {
 
     intervalHandle: number;
 
-    private currentInputs_;
+    private currentInputs_ = new InputState();
 
     constructor(private messenger_: WorkerMessenger, private gameState_: GameState) {
         this.messenger_.getInputs((inputs: InputState) => {
-            if (!this.isStarted) {
-                this.Start();
-                this.Update();
-                this.isStarted = true;
-            }
             this.currentInputs_ = inputs;
         });
-    };
-
-    ngOnDestroy() {
-        clearInterval(this.intervalHandle);
     };
 
     Start() {
@@ -41,16 +27,8 @@ export class GameEngine implements OnDestroy {
         this.gameState_.addNewObject(testObject);
     };
 
-    
-    Update() {
-        this.intervalHandle = setInterval(this.Update, this.timeStep_);
-        let state = this.gameState_.updateObjects(this.timeStep_, this.currentInputs_);
-
+    Update(dt: number) {
+        let state = this.gameState_.updateObjects(dt, this.currentInputs_);
         this.messenger_.pushChanges(state);
     };
-    
-    private isStarted = false;
-    private previousTime_: number = 0;
-    private timeStep_: number = 1000 / 60.0;
-    private dt_: number = 0;
 };

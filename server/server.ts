@@ -16,8 +16,10 @@ app.use("/game-engine", express.static(path.join(__dirname, "game-engine")));
 app.set("port", process.env.PORT || 3000);
 
 app.get("/mesh/:fileName", (req, res) => {
-    var fileName = req.params.fileName;
-    fs.readFile("./assets/mesh/" + fileName, "utf-8", (err, data) => {
+    let fileName = req.params.fileName;
+    let filePath = "./build/assets/mesh/" + fileName + ".json";
+    console.log(filePath);
+    fs.readFile(filePath, "utf-8", (err, data) => {
         if (err) throw err;
         var obj = JSON.parse(data);
         res.json(obj);

@@ -1,11 +1,13 @@
 import {Directive, Input} from "angular2/core";
 
 @Directive({
-    selector: "[canvasFrame]"
+    selector: "[canvasSize]"
 })
-export class CanvasFrameDirective {
+export class CanvasSize {
     @Input() inWidth: number;
     @Input() inHeight: number;
     @Input() inTop: string;
-    @Input() inLeft: string;  
+    @Input() inLeft: string;
+
+    constructor() { };
 }

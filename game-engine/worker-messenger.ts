@@ -1,10 +1,8 @@
-import {Injectable} from "angular2/core";
 import {Subject} from "rxjs/Rx";
 import {InputState} from "./input-state";
 
 declare function postMessage(data: any, transferables?: [ArrayBuffer]): void;
 
-@Injectable()
 export class WorkerMessenger {
     private inputs$ = new Subject<InputState>();
     private modelChanges$ = new Subject<ArrayBuffer>();

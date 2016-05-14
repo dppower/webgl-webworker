@@ -1,9 +1,23 @@
 ///<reference path="../node_modules/typescript/lib/lib.es6.d.ts" />
 
-import {platform, provide} from "angular2/core";
-import {WORKER_APP_PLATFORM, WORKER_APP_APPLICATION} from "angular2/platform/worker_app";
 import {GameEngine} from "./game-engine";
+import {WorkerMessenger} from "./worker-messenger";
+import {GameState} from "./game-state";
+import {Camera} from "./game-camera";
 
-platform([WORKER_APP_PLATFORM])
-    .application([WORKER_APP_APPLICATION])
-    .bootstrap(GameEngine);
+const messenger = new WorkerMessenger();
+
+const camera = new Camera();
+const gameState = new GameState(camera);
+
+const engine = new GameEngine(messenger, gameState);
+
+(function() {
+    engine.Start();
+    let dt = 1000 / 60;
+    let Update = () => {
+        setInterval(Update, dt);
+        engine.Update(dt);
+    };
+    Update();
+})();

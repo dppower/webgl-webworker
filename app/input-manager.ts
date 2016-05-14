@@ -1,14 +1,14 @@
 import {Injectable} from "angular2/core";
 
-var keyBindings = new Map<string, string>();
-keyBindings["forward"] = "e";
-keyBindings["back"] = "d";
-keyBindings["left"] = "s";
-keyBindings["right"] = "f";
-keyBindings["jump"] = "Spacebar";
+var keyBindings = new Map<string, number>();
+keyBindings["forward"] = 69;
+keyBindings["back"] = 68;
+keyBindings["left"] = 83;
+keyBindings["right"] = 70;
+keyBindings["jump"] = 32;
 
-var moves = ["forward", "back", "left", "right"];
-var actions = ["jump"];
+const moves = ["forward", "back", "left", "right"];
+const actions = ["jump"];
 
 export class InputState {
     aspect: number;
@@ -27,44 +27,44 @@ export class InputManager {
     previousMouseX = 0.0;
     previousMouseY = 0.0;
 
-    currentMouseX: number;
-    currentMouseY: number;
+    currentMouseX = 0.0;
+    currentMouseY = 0.0;
 
     setMouseCoords(x: number, y: number) {
         this.currentMouseX = x;
         this.currentMouseY = y;
     };
 
-    previousKeyMap = new Map<string, boolean>();
-    currentKeyMap = new Map<string, boolean>();
+    previousKeyMap = new Map<number, boolean>();
+    currentKeyMap = new Map<number, boolean>();
 
-    isKeyDown(key: string) {
+    isKeyDown(key: number) {
         if (this.currentKeyMap[key] == true) {
             return true;
         }
         return false;
     };
 
-    isKeyPressed(key: string) {
+    isKeyPressed(key: number) {
         if (this.isKeyDown(key) == true && this.wasKeyDown(key) == false) {
             return true;
         }
         return false;
     };
 
-    wasKeyDown(key: string) {
+    wasKeyDown(key: number) {
         if (this.previousKeyMap[key] == true) {
             return true;
         }
         return false;
     };
 
-    set KeyDown(key: string) {
-        this.currentKeyMap[key] = true;
+    setKeyDown(event: KeyboardEvent) {
+        this.currentKeyMap[event.keyCode] = true;
     };
 
-    set KeyUp(key: string) {
-        this.currentKeyMap[key] = false;
+    setKeyUp(event: KeyboardEvent) {
+        this.currentKeyMap[event.keyCode] = false;
     };
 
     get inputs() {
@@ -73,17 +73,19 @@ export class InputManager {
         currentState.mouseDx = this.currentMouseX - this.previousMouseX;
         currentState.mouseDy = this.currentMouseY - this.previousMouseY;
 
-        for (let move in moves) {
+        for (let i in moves) {
+            let move = moves[i];
             let key = keyBindings[move];
             if (this.isKeyDown(key)) {
-                currentState.keyPressed[move];
+                currentState.keyDown.push(move);
             }
         }
 
-        for (let action in actions) {
+        for (let i in actions) {
+            let action = actions[i];
             let key = keyBindings[action];
             if (this.isKeyPressed(key)) {
-                currentState.keyPressed[action];
+                currentState.keyPressed.push(action);
             }
         }
         return currentState;
@@ -100,8 +102,14 @@ export class InputManager {
 
     Update() {
         this.zoom_ = 0.0;
+
+        this.previousMouseX = this.currentMouseX;
+        this.previousMouseY = this.currentMouseY;
+
         this.previousKeyMap.forEach((value, i, map) => {
             map[i] = this.currentKeyMap[i];
         });
+
+        this.currentKeyMap.clear();
     };
 }
