@@ -1,5 +1,5 @@
 {
-  "name": "angular2-quaternions",
+  "name": "angular2-game-engine",
   "version": "1.0.0",
   "scripts": {
     "tsc-server": "tsc -p ./server/",

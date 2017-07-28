@@ -49,7 +49,7 @@ export class Camera {
     private aspect_;
 
     private near_ = 0.1;
-    private far_ = 1000.0;
+    private far_ = 100.0;
 
     private pMatrix_: Float32Array = new Float32Array(16);
 

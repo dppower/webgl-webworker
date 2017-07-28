@@ -22,11 +22,11 @@ export class PngDecoder {
 
                 this.context.drawImage(img, 0, 0);
 
-                let data = this.context.getImageData(0, 0, img.width, img.height);
+                let decodedData = this.context.getImageData(0, 0, img.width, img.height);
 
                 window.URL.revokeObjectURL(img.src);
-
-                resolve(data);
+                
+                resolve(decodedData);
             };
 
             img.src = window.URL.createObjectURL(data);

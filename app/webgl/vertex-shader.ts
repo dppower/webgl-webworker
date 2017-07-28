@@ -16,7 +16,7 @@ export class VertexShader {
 
     private source_: string = `
     attribute vec3 aVertexPosition;
-    attribute vec3 aNormals;
+    attribute vec3 aNormal;
     attribute vec2 aTextureCoordinates;
     
     uniform mat4 uView;
@@ -25,12 +25,16 @@ export class VertexShader {
     
     varying vec2 vTextureCoordinates;
     varying vec3 vNormals;
+    varying vec3 vVertexPosition;
 
     void main(void) {
         
-        gl_Position = uProjection * uView * uTransform * vec4(aVertexPosition, 1.0);
+        vec4 mv_position = uView * uTransform * vec4(aVertexPosition, 1.0)
+        gl_Position = uProjection * mv_position;
         vTextureCoordinates = aTextureCoordinates;
-        vNormals = aNormals;
+        vVertexPosition = vec3(mv_position);
+        // Caution this should be changed to a distinct normal_mat = transpose(inverse(M * V)) when scaling is non-uniform
+        vNormal = vec3(uView * uTransform * vec4(aNormal, 0.0));
     }
     `;
 
