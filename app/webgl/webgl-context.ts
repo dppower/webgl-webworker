@@ -1,9 +1,11 @@
 import { Injectable } from "@angular/core";
 
 @Injectable()
-export class WebGLContextService {
+export class RenderContext {
 
-    get context() { return this.context_; };
+    get context() {
+        return this.context_;
+    };
     
     constructor() { }
 
