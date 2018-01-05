@@ -1,6 +1,4 @@
-///<reference path="../node_modules/typescript/lib/lib.es6.d.ts" />
+import { platformBrowserDynamic } from "@angular/platform-browser-dynamic";
+import { AppModule } from "./app.module";
 
-import {bootstrap} from "angular2/platform/browser";
-import {AppComponent} from "./app.component";
-
-bootstrap(AppComponent);
+platformBrowserDynamic().bootstrapModule(AppModule);

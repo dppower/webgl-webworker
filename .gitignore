@@ -1,6 +1,7 @@
-assets/
-build/
+bin
+obj
+build
 public/mesh
-node_modules/
-typings/
-typings.json
+public/textures
+.vs
+node_modules

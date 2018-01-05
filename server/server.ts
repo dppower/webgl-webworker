@@ -1,13 +1,13 @@
 import express = require("express");
 import http = require("http");
 import path = require("path");
-import morgan = require("morgan");
+//import morgan = require("morgan");
 import fs = require("fs");
 
 var app = express();
 
-app.use(morgan("dev"));
-app.use("/scripts", express.static(path.join(__dirname, "../node_modules")));
+//app.use(morgan("dev"));
+app.use("/scripts", express.static(path.join(__dirname, "./node_modules")));
 app.use("/app", express.static(path.join(__dirname, "app")));
 app.use("/css", express.static(path.join(__dirname, "css")));
 app.use("/js", express.static(path.join(__dirname, "js")));
@@ -18,7 +18,6 @@ app.set("port", process.env.PORT || 3000);
 app.get("/mesh/:fileName", (req, res) => {
     let fileName = req.params.fileName;
     let filePath = "./build/assets/mesh/" + fileName + ".json";
-    console.log(filePath);
     fs.readFile(filePath, "utf-8", (err, data) => {
         if (err) throw err;
         var obj = JSON.parse(data);
