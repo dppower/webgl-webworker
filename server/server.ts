@@ -8,16 +8,17 @@ var app = express();
 
 //app.use(morgan("dev"));
 app.use("/scripts", express.static(path.join(__dirname, "./node_modules")));
-app.use("/app", express.static(path.join(__dirname, "app")));
-app.use("/css", express.static(path.join(__dirname, "css")));
-app.use("/js", express.static(path.join(__dirname, "js")));
-app.use("/game-engine", express.static(path.join(__dirname, "game-engine")));
+app.use("/app", express.static(path.join(__dirname, "build", "app")));
+app.use("/css", express.static(path.join(__dirname, "public", "css")));
+app.use("/js", express.static(path.join(__dirname, "public", "js")));
+app.use("/load-engine.js", express.static(path.join(__dirname, "public", "js", "load-engine.js")));
+app.use("/game-engine", express.static(path.join(__dirname, "build", "game-engine")));
 
 app.set("port", process.env.PORT || 3000);
 
 app.get("/mesh/:fileName", (req, res) => {
     let fileName = req.params.fileName;
-    let filePath = "./build/assets/mesh/" + fileName + ".json";
+    let filePath = "./public/mesh/" + fileName + ".json";
     fs.readFile(filePath, "utf-8", (err, data) => {
         if (err) throw err;
         var obj = JSON.parse(data);
@@ -26,7 +27,7 @@ app.get("/mesh/:fileName", (req, res) => {
 });
 
 app.get("*", (request, response) => {
-    response.sendFile(path.join(__dirname, "./index.html"));
+    response.sendFile(path.join(__dirname, "public", "html", "./index.html"));
 });
 
 var server = http.createServer(app);

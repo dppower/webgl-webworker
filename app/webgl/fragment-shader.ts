@@ -26,8 +26,8 @@ export class FragmentShader {
     varying vec3 vVertexPosition;
     varying vec3 vNormal;
 
-    varying vec2 vTextureCoordinates;
-    uniform sampler2D uTexture;
+    //varying vec2 vTextureCoordinates;
+    //uniform sampler2D uTexture;
 
     void main(void) {
         vec3 n = normalize(vNormal);
@@ -36,9 +36,10 @@ export class FragmentShader {
         vec3 v = -vVertexPosition;
         vec3 h = normalize(l + v);
 
-        vec4 c = texture2D(uTexture, vTextureCoordinates);
-        float NdotL = clamp(dot(n, l), 0, 1);
-        gl_FragColor = c * ambient + vec4(c.xyz * NdotL, 1.0f);
+        //vec4 c = texture2D(uTexture, vTextureCoordinates);
+        vec4 c = vec4(0.898, 0.815, 0.482, 1.0);
+        float NdotL = clamp(dot(n, l), 0.0, 1.0);
+        gl_FragColor = c * ambient + vec4(c.xyz * NdotL, 1.0);
     }
     `;
 

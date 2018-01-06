@@ -1,15 +1,15 @@
-import {Injectable, Inject} from "angular2/core";
-import {Subject} from "rxjs/Rx";
-import {InputState} from "./input-manager";
-import {GAME_ENGINE} from "./service-tokens";
+import { Injectable, Inject } from "@angular/core";
+import { Subject } from "rxjs/Subject";
+import { InputState } from "../canvas/input-manager";
+import { GAME_ENGINE } from "../service-tokens";
 
 @Injectable()
-export class RenderMessenger {
+export class Messenger {
 
     private inputs$ = new Subject<InputState>();
     private modelChanges$ = new Subject<Float32Array>();
 
-    constructor(@Inject(GAME_ENGINE)private worker_: Worker) {
+    constructor(@Inject(GAME_ENGINE) private worker_: Worker) {
         this.worker_.onmessage = this.handleMessages;
 
         this.inputs$.subscribe((inputs: InputState) => {            
@@ -37,5 +37,4 @@ export class RenderMessenger {
     sendInputs(inputs: InputState) {
         this.inputs$.next(inputs);
     };
-
 };

@@ -6,6 +6,7 @@
 
     var map = {
         "app": "app",
+        "game-engine": "game-engine",
         "rxjs": "scripts/rxjs",
         "tslib": "scripts/tslib",
         "@angular/common/http": "scripts/@angular/common/bundles/common-http.umd.js"
@@ -22,6 +23,7 @@
 
     var packages = {
         "app": { main: "./main.js", defaultExtension: "js" },
+        "game-engine": { main: "./main.js", defaultExtension: "js" },
         "rxjs": { defaultExtension: "js" },
         "tslib": { main: "./tslib.js", defaultExtension: "js" }
     };

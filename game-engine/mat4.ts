@@ -1,5 +1,5 @@
-import {Vec3} from "./vec3";
-import {Quaternion} from "./quaternion";
+import { Vec3 } from "./vec3";
+import { Quaternion } from "./quaternion";
 
 export class Mat4 {
 

@@ -1,24 +1,21 @@
-import {WorkerMessenger} from "./worker-messenger";
-import {Camera} from "./game-camera";
-import {GameObject} from "./game-object";
-import {Transform} from "./transform";
-import {GameState} from "./game-state";
-import {InputState} from "./input-state";
-
-interface Performance {
-    now(): number;
-}
-declare var performance: Performance;
+import { Subscription } from "rxjs/Subscription";
+import { WorkerMessenger } from "./worker-messenger";
+import { Camera } from "./game-camera";
+import { GameObject } from "./game-object";
+import { Transform } from "./transform";
+import { GameState } from "./game-state";
+import { InputState } from "./input-state";
 
 export class GameEngine {
 
     intervalHandle: number;
 
-    private currentInputs_ = new InputState();
+    private current_inputs_ = new InputState();
+    private inputs_subscription: Subscription;
 
     constructor(private messenger_: WorkerMessenger, private gameState_: GameState) {
-        this.messenger_.getInputs((inputs: InputState) => {
-            this.currentInputs_ = inputs;
+        this.inputs_subscription = this.messenger_.getInputs().subscribe((inputs) => {
+            this.current_inputs_ = inputs;
         });
     };
 
@@ -28,7 +25,11 @@ export class GameEngine {
     };
 
     Update(dt: number) {
-        let state = this.gameState_.updateObjects(dt, this.currentInputs_);
+        let state = this.gameState_.updateObjects(dt, this.current_inputs_);
         this.messenger_.pushChanges(state);
+    };
+
+    dispose() {
+        this.inputs_subscription.unsubscribe();
     };
 };

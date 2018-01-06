@@ -1,6 +1,6 @@
-import {GameObject} from "./game-object";
-import {Camera} from "./game-camera";
-import {InputState} from "./input-state";
+import { GameObject } from "./game-object";
+import { Camera } from "./game-camera";
+import { InputState } from "./input-state";
 
 export class GameState {
 

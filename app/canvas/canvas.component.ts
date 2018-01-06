@@ -1,119 +1,109 @@
-import {Component, ViewChild, ElementRef, AfterViewInit, OnDestroy, NgZone} from "angular2/core";
-import {RenderContext} from "./webgl/webgl-context";
-import {ShaderProgram, BASIC_SHADER} from "./webgl/webgl-program";
-import {FragmentShader} from "./webgl/fragment-shader";
-import {VertexShader} from "./webgl/vertex-shader";
-import {RenderBatch, RENDER_PROVIDERS} from "./render-batch";
-import {RenderMessenger} from "./render-messenger";
-import {InputManager} from "./input-manager";
-import {MeshLoader} from "./mesh-loader";
+import { Component, ViewChild, ElementRef, AfterViewInit, OnDestroy } from "@angular/core";
 
-const RENDER_OBJECTS = 3;
+import { RenderContext } from "../webgl/webgl-context";
+import { ShaderProgram } from "../webgl/webgl-program";
+
+import { RenderBatch } from "../render/render-batch";
+import { Messenger } from "../worker/messenger";
+import { InputManager } from "./input-manager";
 
 @Component({
     selector: 'main-canvas',
     template: `
-    <canvas id="canvas" 
-        #canvas 
-        [width]="getCanvasWidth()" 
-        [height]="getCanvasHeight()" 
-        [style.width]="canvasWidth" 
-        [style.height]="canvasHeight" 
-        [style.top]="canvasTop" 
-        [style.left]="canvasLeft">
-        <p>
-            {{fallbackText}}
-        </p>
+    <canvas id="canvas" #canvas canvas-controller [width]="canvas_width" [height]="canvas_height">
+        <p>{{fallback_text}}</p>
     </canvas>
     `,
     styles: [`
     #canvas {
+        height: 100%;
+        width: 100%;
         border: none;
         position: absolute;
         z-index: 0;
     }
-    `],
-    providers: [RenderContext, BASIC_SHADER, RenderMessenger, RENDER_PROVIDERS]
+    `]
 })
-export class MainCanvas implements OnDestroy {
-    @ViewChild("canvas") canvasRef: ElementRef;
+export class CanvasComponent implements OnDestroy {
+    @ViewChild("canvas") canvas_ref: ElementRef;
     
-    fallbackText: string = "Loading Canvas...";
+    fallback_text: string = "Loading Canvas...";
 
     // TODO If the client could change resolution, the binding to canvas height and width (dimensions of drawing buffer),
     // would be different to the style.height and style.width of the canvas.
-    canvasWidth: number;
-    canvasHeight: number;
-    canvasTop: string;
-    canvasLeft: string;
+    //canvasWidth: number;
+    //canvasHeight: number;
+    //canvasTop: string;
+    //canvasLeft: string;
+    get canvas_width() {
+        return this.canvas_ref.nativeElement.clientWidth;
+    };
 
-    cancelToken: number;
+    get canvas_height() {
+        return this.canvas_ref.nativeElement.clientHeight;
+    };
 
-    private modelChanges_ = new Float32Array(RENDER_OBJECTS * 16);
+    readonly RENDER_OBJECTS = 3;
+
+    private cancel_token_: number;
+
+    private model_changes_ = new Float32Array(this.RENDER_OBJECTS * 16);
 
     constructor(
         private gl_: RenderContext,
         private program_: ShaderProgram,
-        private inputManager_: InputManager,
-        private renderMessenger_: RenderMessenger,
-        private renderBatch_: RenderBatch,
-        private zone_: NgZone
+        private input_manager_: InputManager,
+        private messenger_: Messenger,
+        private render_batch_: RenderBatch
     ) {
-        this.renderMessenger_.getChanges((array) => {
-            this.modelChanges_.set(array);
+        this.messenger_.getChanges((array) => {
+            this.model_changes_.set(array);
         });
     };
     
-    getCanvasWidth() {
-        let width = this.canvasWidth > 1920 ? 1920 : this.canvasWidth;
-        return width;
-    };
+    //getCanvasWidth() {
+    //    let width = this.canvasWidth > 1920 ? 1920 : this.canvasWidth;
+    //    return width;
+    //};
 
-    getCanvasHeight() {
-        let height = this.canvasHeight > 1080 ? 1080 : this.canvasHeight;
-        return height;
-    };
+    //getCanvasHeight() {
+    //    let height = this.canvasHeight > 1080 ? 1080 : this.canvasHeight;
+    //    return height;
+    //};
 
     ngAfterViewInit() {
-        let gl = this.gl_.create(this.canvasRef.nativeElement);
+        let gl = this.gl_.create(this.canvas_ref.nativeElement);
         
         if (gl) {
             this.program_.initWebGl();
 
-            let gameObjects = ["base-model"];
-            this.renderBatch_.Start(gameObjects);
-
-            //this.cancelToken = requestAnimationFrame(this.tick);
-            this.zone_.runOutsideAngular(() => {
-                let timeNow = performance.now();
-                this.tick(timeNow);
-            });
+            let game_objects = ["base-model"];
+            this.render_batch_.start(game_objects);
+            
+            this.cancel_token_ = requestAnimationFrame(this.tick);
         }
         else {
             setTimeout(() => {
-                this.fallbackText = "Unable to initialise WebGL."
+                this.fallback_text = "Unable to initialise WebGL."
             }, 0);
         }
     }
     
     private tick = (timestamp: number) => {
-        this.cancelToken = requestAnimationFrame(this.tick);
+        this.cancel_token_ = requestAnimationFrame(this.tick);
         
-        let inputs = this.inputManager_.inputs;
+        let inputs = this.input_manager_.inputs;
 
-        inputs.aspect = this.canvasWidth / this.canvasHeight;
+        inputs.aspect = this.canvas_width / this.canvas_height;
 
-        this.renderMessenger_.sendInputs(inputs);
+        this.messenger_.sendInputs(inputs);
 
-        this.inputManager_.Update();
+        this.input_manager_.update();
 
-        let view = this.modelChanges_.subarray(0, 16);
-        let projection = this.modelChanges_.subarray(16, 32);
+        let view = this.model_changes_.subarray(0, 16);
+        let projection = this.model_changes_.subarray(16, 32);
 
         this.render(view, projection);
-        
-        console.log("---------------");
-        console.log("current time: " + timestamp);
     };
 
     private render(view: Float32Array, projection: Float32Array) {
@@ -124,15 +114,14 @@ export class MainCanvas implements OnDestroy {
         gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
         gl.uniformMatrix4fv(this.program_.uView, false, view);
-
         gl.uniformMatrix4fv(this.program_.uProjection, false, projection);
 
-        this.renderBatch_.DrawAll(this.modelChanges_);
+        this.render_batch_.drawAll(this.model_changes_);
     };
 
     ngOnDestroy() {
         //this.context_.get.deleteProgram(this.program_.get);
-        cancelAnimationFrame(this.cancelToken);
+        cancelAnimationFrame(this.cancel_token_);
         // TODO remove when a better way of chceking if meshes are up to date.
         localStorage.clear();
     }

@@ -1,36 +1,39 @@
-import {Subject} from "rxjs/Rx";
-import {InputState} from "./input-state";
+import { Subject } from "rxjs/Subject";
+import { Subscription } from "rxjs/Subscription";
 
-declare function postMessage(data: any, transferables?: [ArrayBuffer]): void;
+import { InputState } from "./input-state";
 
 export class WorkerMessenger {
-    private inputs$ = new Subject<InputState>();
-    private modelChanges$ = new Subject<ArrayBuffer>();
+
+    private input_changes_ = new Subject<InputState>();
+    private model_changes_ = new Subject<ArrayBuffer>();
+    private model_changes_subscription_: Subscription;
 
     constructor() { 
         addEventListener("message", this.handleMessages);
 
-        this.modelChanges$.subscribe((data: ArrayBuffer) => {
+        this.model_changes_subscription_ = this.model_changes_.subscribe((data: ArrayBuffer) => {
             postMessage(data, [data]);
         });
     };
 
     private handleMessages: EventListener = (event: MessageEvent) => {
-        this.inputs$.next(event.data);
+        this.input_changes_.next(event.data);
     };
 
     dispose() {
         removeEventListener("message", this.handleMessages);
-        this.modelChanges$.complete();
-        this.inputs$.complete();
+        this.model_changes_.complete();
+        this.input_changes_.complete();
+        this.model_changes_subscription_.unsubscribe();
     };
 
     pushChanges(buffer: ArrayBuffer) {
-        this.modelChanges$.next(buffer);
+        this.model_changes_.next(buffer);
     };
 
-    getInputs(onNext: (inputs: InputState) => void) {
-        return this.inputs$.subscribe(onNext);
+    getInputs() {
+        return this.input_changes_.asObservable();
     };
       
 };

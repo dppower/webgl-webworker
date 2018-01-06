@@ -1,4 +1,4 @@
-import {Vec3} from "./vec3";
+import { Vec3 } from "./vec3";
 
 export class Quaternion {
     constructor(axis = new Vec3(), angle = 0.0) {

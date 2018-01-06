@@ -24,22 +24,21 @@
   <ItemGroup>
     <Content Include="tsconfig.json" />
     <TypeScriptCompile Include="app-main.component.ts" />
-    <TypeScriptCompile Include="app.component.ts" />
     <TypeScriptCompile Include="app.module.ts" />
-    <TypeScriptCompile Include="canvas\canvas-frame.component.ts" />
-    <TypeScriptCompile Include="canvas\canvas-size.directive.ts" />
+    <TypeScriptCompile Include="canvas\canvas-controller.directive.ts" />
     <TypeScriptCompile Include="canvas\canvas.component.ts" />
     <TypeScriptCompile Include="canvas\canvas.module.ts" />
     <TypeScriptCompile Include="canvas\input-manager.ts" />
     <TypeScriptCompile Include="main.ts" />
-    <TypeScriptCompile Include="canvas\render-batch.ts" />
-    <TypeScriptCompile Include="worker\render-messenger.ts" />
-    <TypeScriptCompile Include="assets\render-object.ts" />
+    <TypeScriptCompile Include="render\mesh-loader.ts" />
+    <TypeScriptCompile Include="render\png-decoder.ts" />
+    <TypeScriptCompile Include="render\render-batch.ts" />
+    <TypeScriptCompile Include="render\render-object.ts" />
+    <TypeScriptCompile Include="render\render.module.ts" />
+    <TypeScriptCompile Include="render\texture-loader.ts" />
+    <TypeScriptCompile Include="worker\messenger.ts" />
     <TypeScriptCompile Include="service-tokens.ts" />
-    <TypeScriptCompile Include="assets\texture-loader.ts" />
     <TypeScriptCompile Include="webgl\fragment-shader.ts" />
-    <TypeScriptCompile Include="assets\mesh-loader.ts" />
-    <TypeScriptCompile Include="assets\png-decoder.ts" />
     <TypeScriptCompile Include="webgl\vertex-shader.ts" />
     <TypeScriptCompile Include="webgl\webgl-context.ts" />
     <TypeScriptCompile Include="webgl\webgl-program.ts" />
@@ -47,7 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="canvas\" />
-    <Folder Include="assets\" />
+    <Folder Include="render\" />
     <Folder Include="worker\" />
     <Folder Include="webgl" />
   </ItemGroup>

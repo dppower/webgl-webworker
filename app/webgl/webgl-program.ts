@@ -59,7 +59,7 @@ export class ShaderProgram {
         this.aVertexPosition_ = gl.getAttribLocation(this.program_, "aVertexPosition");
         gl.enableVertexAttribArray(this.aVertexPosition_);
 
-        this.aNormals_ = gl.getAttribLocation(this.program_, "aNormals");
+        this.aNormals_ = gl.getAttribLocation(this.program_, "aNormal");
         gl.enableVertexAttribArray(this.aNormals_);
     };
 

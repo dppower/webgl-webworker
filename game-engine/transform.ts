@@ -1,6 +1,6 @@
-import {Vec3} from "./vec3";
-import {Quaternion} from "./quaternion";
-import {Mat4} from "./mat4";
+import { Vec3 } from "./vec3";
+import { Quaternion } from "./quaternion";
+import { Mat4 } from "./mat4";
 
 export class Transform {
 

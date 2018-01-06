@@ -1,4 +1,5 @@
-import { Component } from "@angular/core";
+import { Component, OnDestroy, Inject } from "@angular/core";
+import { GAME_ENGINE } from "./service-tokens";
 
 @Component({
     selector: "app-main",
@@ -6,4 +7,11 @@ import { Component } from "@angular/core";
     <main-canvas></main-canvas>
     `
 })
-export class AppMainComponent { }
+export class AppMainComponent implements OnDestroy {
+    
+    constructor(@Inject(GAME_ENGINE) private game_engine_: Worker) { };
+
+    ngOnDestroy() {
+        this.game_engine_.terminate();
+    };
+}

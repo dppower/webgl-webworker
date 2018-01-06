@@ -5,3 +5,4 @@ public/mesh
 public/textures
 .vs
 node_modules
+server.js

@@ -1,5 +1,5 @@
-import {Transform} from "./transform";
-import {Vec3} from "./vec3";
+import { Transform } from "./transform";
+import { Vec3 } from "./vec3";
 
 export class Camera {
 
@@ -46,7 +46,7 @@ export class Camera {
         this.pMatrix_[14] = 2.0 * (this.near_ * this.far_) * depth;       
     };
 
-    private aspect_;
+    private aspect_: number;
 
     private near_ = 0.1;
     private far_ = 100.0;

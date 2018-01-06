@@ -2,25 +2,21 @@
 
 // Modules
 import { WebGLModule } from "../webgl/webgl.module";
+import { RenderModule } from "../render/render.module";
 
 // Components
-import { MainCanvasComponent } from "./main-canvas.component";
+import { CanvasComponent } from "./canvas.component";
 
 // Directives
 import { CanvasController } from "./canvas-controller.directive";
 
 // Services
-import { Camera } from "../objects/camera";
-import { XAxis } from "../objects/x-axis";
-import { YAxis } from "../objects/y-axis";
-import { ZAxis } from "../objects/z-axis";
-
-import { Transform } from "../maths/transform";
+import { InputManager } from "./input-manager";
 
 @NgModule({
-    imports: [ WebGLModule ],
-    declarations: [ MainCanvasComponent, CanvasController ],
-    providers: [ Camera, XAxis, YAxis, ZAxis, { provide: "axis-transform", useValue: new Transform() } ],
-    exports: [ MainCanvasComponent ]
+    imports: [ WebGLModule, RenderModule ],
+    declarations: [ CanvasComponent, CanvasController ],
+    providers: [ InputManager ],
+    exports: [ CanvasComponent ]
 })
 export class CanvasModule { };

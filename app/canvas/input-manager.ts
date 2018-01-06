@@ -1,4 +1,4 @@
-import {Injectable} from "angular2/core";
+import { Injectable } from "@angular/core";
 
 var keyBindings = new Map<string, number>();
 keyBindings["forward"] = 69;
@@ -13,10 +13,10 @@ const actions = ["jump"];
 export class InputState {
     aspect: number;
     zoom = 0.0;
-    mouseDx = 0.0;
-    mouseDy = 0.0;
-    keyDown: string[] = [];
-    keyPressed: string[] = [];
+    mouse_dx = 0.0;
+    mouse_dy = 0.0;
+    keys_down: string[] = [];
+    keys_pressed: string[] = [];
 };
 
 @Injectable()
@@ -70,14 +70,14 @@ export class InputManager {
     get inputs() {
         let currentState = new InputState();
         currentState.zoom = this.zoom_;
-        currentState.mouseDx = this.currentMouseX - this.previousMouseX;
-        currentState.mouseDy = this.currentMouseY - this.previousMouseY;
+        currentState.mouse_dx = this.currentMouseX - this.previousMouseX;
+        currentState.mouse_dy = this.currentMouseY - this.previousMouseY;
 
         for (let i in moves) {
             let move = moves[i];
             let key = keyBindings[move];
             if (this.isKeyDown(key)) {
-                currentState.keyDown.push(move);
+                currentState.keys_down.push(move);
             }
         }
 
@@ -85,7 +85,7 @@ export class InputManager {
             let action = actions[i];
             let key = keyBindings[action];
             if (this.isKeyPressed(key)) {
-                currentState.keyPressed.push(action);
+                currentState.keys_pressed.push(action);
             }
         }
         return currentState;
@@ -100,7 +100,7 @@ export class InputManager {
         }
     };
 
-    Update() {
+    update() {
         this.zoom_ = 0.0;
 
         this.previousMouseX = this.currentMouseX;
