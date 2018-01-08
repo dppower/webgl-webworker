@@ -1,8 +1,8 @@
 bin
 obj
 build
-public/mesh
-public/textures
+build-aot
+docs/textures
 .vs
 node_modules
 server.js
