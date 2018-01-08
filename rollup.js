@@ -1,4 +1,5 @@
 ﻿const fs = require("fs");
+const path = require("path");
 const rollup = require("rollup");
 const nodeResolve = require("rollup-plugin-node-resolve");
 const uglify = require("rollup-plugin-uglify");
@@ -7,8 +8,7 @@ const rxPaths = require("rxjs/_esm5/path-mapping");
 
 const prefix = process.argv[2];
 const input = process.argv[3];
-console.log(prefix);
-console.log(input);
+
 function createBundle(input) {
     return rollup.rollup(
         {
@@ -41,6 +41,7 @@ function writeBundle(bundle, prefix) {
 }
 
 (async function main(input, prefix) {
+    console.log(path.join(__dirname, input));
     let bundle = await createBundle(input);
     await writeBundle(bundle, prefix);
 })(input, prefix)

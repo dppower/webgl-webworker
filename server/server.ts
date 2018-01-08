@@ -18,7 +18,7 @@ app.set("port", process.env.PORT || 3000);
 
 app.get("/mesh/:fileName", (req, res) => {
     let fileName = req.params.fileName;
-    let filePath = "./docs/mesh/" + fileName + ".json";
+    let filePath = "./docs/mesh/" + fileName;
     fs.readFile(filePath, "utf-8", (err, data) => {
         if (err) throw err;
         var obj = JSON.parse(data);

@@ -49,7 +49,7 @@ export class MeshLoader {
             return rxOf(mesh);
         }
 
-        return this.http_client_.get<MeshData>("mesh/" + file_name)
+        return this.http_client_.get<MeshData>("mesh/" + file_name + ".json")
             .pipe(
                 tap(data => {
                     return this.saveToLocalStorage(file_name, data)

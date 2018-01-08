@@ -2,8 +2,8 @@
     "name": "webgl-webworker",
     "version": "1.0.0",
     "scripts": {
-        "rollup-engine": "node ./rollup.js 'engine' './build/game-engine/main.js'",
-        "rollup-app": "node ./rollup.js 'app' './entry.js'",
+        "rollup-engine": "node ./rollup.js engine ./build/game-engine/main.js",
+        "rollup-app": "node ./rollup.js app ./entry.js",
         "ngc": "./node_modules/.bin/ngc -p ./ngc-config.json",
         "aot": "npm run ngc && npm run rollup-app",
         "tsc": "./node_modules/.bin/tsc -p ./app",
