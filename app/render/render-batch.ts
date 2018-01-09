@@ -33,6 +33,6 @@ export class RenderBatch {
         //TODO if objects share a texture, should bind texture once and draw all similar objects.
         let transform = new Float32Array(16);
         transform.set(models.subarray(32, 48));
-        this.render_objects_.get("base-model").draw(this.gl_.context, this.program_, transform);
+        this.render_objects_.get("cube_low").draw(this.gl_.context, this.program_, transform);
     };
 }

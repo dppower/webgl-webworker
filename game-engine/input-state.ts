@@ -1,8 +1,8 @@
 export class InputState {
-    aspect = 1.4;
-    zoom = 0.0;
-    mouseDx = 0.0;
-    mouseDy = 0.0;
-    keyDown: string[] = [];
-    keyPressed: string[] = [];
+    left: false;
+    right: false;
+    wheel: 0;
+    position: { x: 0, y: 0 };
+    delta: { x: 0, y: 0 };
+    aspect: 1.4;
 };

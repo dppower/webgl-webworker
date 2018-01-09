@@ -1,10 +1,11 @@
 import { Transform } from "./transform";
 import { Vec3 } from "./vec3";
+import { InputState } from "./input-state";
 
 export class Camera {
 
     minZoom: number = -3.0;
-    maxZoom: number = -4.0;
+    maxZoom: number = -6.0;
     zoomSpeed: number = 0.2;
 
     constructor() {
@@ -22,17 +23,17 @@ export class Camera {
         return this.pMatrix_;
     };
     
-    update(direction: number, aspect: number) {
-        let zoom = direction * this.zoomSpeed;
+    update(inputs: InputState) {
+        let zoom = -1 * inputs.wheel * this.zoomSpeed;
         let currentPosition = this.vMatrix_[14];
 
-        zoom = (zoom + currentPosition <= this.minZoom) ? 0.0 : ((zoom + currentPosition >= this.maxZoom) ? 0.0 : zoom);
+        zoom = (zoom + currentPosition >= this.minZoom) ? 0.0 : ((zoom + currentPosition <= this.maxZoom) ? 0.0 : zoom);
 
         let transform = new Vec3(0.0, 0.0, zoom);
         this.transform_.translate(transform);
         this.vMatrix_ = this.transform_.transform;
 
-        this.aspect_ = aspect;
+        this.aspect_ = inputs.aspect;
     };
 
     calculateFrustrum() {

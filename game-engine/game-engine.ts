@@ -5,6 +5,8 @@ import { GameObject } from "./game-object";
 import { Transform } from "./transform";
 import { GameState } from "./game-state";
 import { InputState } from "./input-state";
+import { Quaternion } from "./quaternion";
+import { Vec3 } from "./vec3";
 
 export class GameEngine {
 
@@ -20,7 +22,7 @@ export class GameEngine {
     };
 
     Start() {
-        let testObject = new GameObject(new Transform());
+        let testObject = new GameObject(new Transform(new Vec3(), new Vec3(1, 1, 1), new Quaternion(new Vec3(1.0, 0, 0), -90)));
         this.gameState_.addNewObject(testObject);
     };
 

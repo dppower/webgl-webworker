@@ -1,3 +1,4 @@
+
 import { GameEngine } from "./game-engine";
 import { WorkerMessenger } from "./worker-messenger";
 import { GameState } from "./game-state";
@@ -9,13 +10,12 @@ const camera = new Camera();
 const gameState = new GameState(camera);
 
 const engine = new GameEngine(messenger, gameState);
+let interval_token: number;
 
 (function() {
     engine.Start();
-    let dt = 1000 / 60;
-    let Update = () => {
-        setInterval(Update, dt);
+    let dt = 20; // 1000 / 50 ms per update
+    interval_token = self.setInterval(() => {
         engine.Update(dt);
-    };
-    Update();
+    }, dt);
 })();

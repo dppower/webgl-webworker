@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 15.0.27004.2010
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "app", "app\app.njsproj", "{B4336CEC-6AF3-4A66-AD30-570546A88C38}"
+	ProjectSection(ProjectDependencies) = postProject
+		{562A7019-C3CB-4E35-95D4-B69BDCF3DCC9} = {562A7019-C3CB-4E35-95D4-B69BDCF3DCC9}
+	EndProjectSection
 EndProject
 Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "server", "server\server.njsproj", "{830EB6BA-072D-4DE0-9BC9-9AAFF90438B9}"
 EndProject

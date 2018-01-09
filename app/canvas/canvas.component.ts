@@ -28,13 +28,7 @@ export class CanvasComponent implements OnDestroy {
     @ViewChild("canvas") canvas_ref: ElementRef;
     
     fallback_text: string = "Loading Canvas...";
-
-    // TODO If the client could change resolution, the binding to canvas height and width (dimensions of drawing buffer),
-    // would be different to the style.height and style.width of the canvas.
-    //canvasWidth: number;
-    //canvasHeight: number;
-    //canvasTop: string;
-    //canvasLeft: string;
+    
     get canvas_width() {
         return this.canvas_ref.nativeElement.clientWidth;
     };
@@ -56,7 +50,7 @@ export class CanvasComponent implements OnDestroy {
         private messenger_: Messenger,
         private render_batch_: RenderBatch
     ) {
-        this.messenger_.getChanges((array) => {
+        this.messenger_.getChanges().subscribe((array) => {
             this.model_changes_.set(array);
         });
     };
@@ -77,7 +71,7 @@ export class CanvasComponent implements OnDestroy {
         if (gl) {
             this.program_.initWebGl();
 
-            let game_objects = ["base-model"];
+            let game_objects = ["cube_low"];
             this.render_batch_.start(game_objects);
             
             this.cancel_token_ = requestAnimationFrame(this.tick);
@@ -92,7 +86,7 @@ export class CanvasComponent implements OnDestroy {
     private tick = (timestamp: number) => {
         this.cancel_token_ = requestAnimationFrame(this.tick);
         
-        let inputs = this.input_manager_.inputs;
+        let inputs = this.input_manager_.current_state;
 
         inputs.aspect = this.canvas_width / this.canvas_height;
 

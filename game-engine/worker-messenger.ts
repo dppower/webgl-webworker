@@ -13,7 +13,7 @@ export class WorkerMessenger {
         addEventListener("message", this.handleMessages);
 
         this.model_changes_subscription_ = this.model_changes_.subscribe((data: ArrayBuffer) => {
-            postMessage(data, [data]);
+            postMessage({ time: self.performance.now(), buffer: data }, [data]);
         });
     };
 

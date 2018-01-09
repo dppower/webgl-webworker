@@ -16,7 +16,7 @@ import { GAME_ENGINE } from "./service-tokens";
 @NgModule({
     imports: [ BrowserModule, HttpClientModule, CanvasModule ],
     declarations: [ AppMainComponent ],
-    providers: [ Messenger, { provide: GAME_ENGINE, useValue: new Worker("load-engine.js") } ],
+    providers: [ Messenger, { provide: GAME_ENGINE, useValue: new Worker("engine-bundle.js") } ],
     bootstrap: [ AppMainComponent ]
 })
 export class AppModule { };

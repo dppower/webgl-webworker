@@ -1,40 +1,38 @@
 import { Injectable, Inject } from "@angular/core";
 import { Subject } from "rxjs/Subject";
-import { InputState } from "../canvas/input-manager";
+import { PointerState } from "../canvas/input-manager";
 import { GAME_ENGINE } from "../service-tokens";
 
 @Injectable()
 export class Messenger {
 
-    private inputs$ = new Subject<InputState>();
-    private modelChanges$ = new Subject<Float32Array>();
+    private inputs$ = new Subject<PointerState>();
+    private model_changes_ = new Subject<Float32Array>();
 
     constructor(@Inject(GAME_ENGINE) private worker_: Worker) {
         this.worker_.onmessage = this.handleMessages;
 
-        this.inputs$.subscribe((inputs: InputState) => {            
+        this.inputs$.subscribe(inputs => {            
             this.worker_.postMessage(inputs);
         });
     };
 
-    counter = 0;
+    private handleMessages: EventListener = (event: MessageEvent) => {       
+        let array = new Float32Array(event.data.buffer);
+        this.model_changes_.next(array);
+    };
 
-    private handleMessages: EventListener = (event: MessageEvent) => {
-        let array = new Float32Array(event.data);
-        this.modelChanges$.next(array);
+    getChanges() {
+        return this.model_changes_.asObservable();
+    };
+
+    sendInputs(inputs: PointerState) {
+        this.inputs$.next(inputs);
     };
 
     dispose() {
         removeEventListener("message", this.handleMessages);
-        this.modelChanges$.complete();
+        this.model_changes_.complete();
         this.inputs$.complete();
-    };
-
-    getChanges(onNext: (array: Float32Array) => void) {
-        return this.modelChanges$.subscribe(onNext);
-    };
-
-    sendInputs(inputs: InputState) {
-        this.inputs$.next(inputs);
     };
 };
