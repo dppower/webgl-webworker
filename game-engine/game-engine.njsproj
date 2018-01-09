@@ -31,6 +31,9 @@
     <TypeScriptCompile Include="mat4.ts" />
     <TypeScriptCompile Include="quaternion.ts" />
     <TypeScriptCompile Include="transform.ts" />
+    <TypeScriptCompile Include="types.d.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="vec3.ts" />
     <TypeScriptCompile Include="worker-messenger.ts" />
   </ItemGroup>

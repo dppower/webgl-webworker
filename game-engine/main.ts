@@ -1,18 +1,22 @@
-
+import { Injector, StaticProvider } from "@angular/core";
 import { GameEngine } from "./game-engine";
 import { WorkerMessenger } from "./worker-messenger";
 import { GameState } from "./game-state";
 import { Camera } from "./game-camera";
 
-const messenger = new WorkerMessenger();
+const providers: StaticProvider[] = [
+    { provide: GameEngine, deps: [WorkerMessenger, GameState] },
+    { provide: Camera, deps: [] },
+    { provide: GameState, deps: [Camera] },
+    { provide: WorkerMessenger, deps: [] }
+];
 
-const camera = new Camera();
-const gameState = new GameState(camera);
+const injector = Injector.create(providers);
 
-const engine = new GameEngine(messenger, gameState);
 let interval_token: number;
 
-(function() {
+(function () {
+    const engine = injector.get(GameEngine);
     engine.Start();
     let dt = 20; // 1000 / 50 ms per update
     interval_token = self.setInterval(() => {
